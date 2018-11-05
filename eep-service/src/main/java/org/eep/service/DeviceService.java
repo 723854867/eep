@@ -44,10 +44,10 @@ public class DeviceService {
 		return deviceManager.devices(ids);
 	}
 	
-	public List<DeviceCategory> categories(Param param) {
+	public Pager<DeviceCategory> categories(Param param) {
 		if (null != param.getPage())
 			PageHelper.startPage(param.getPage(), param.getPageSize());
-		return deviceManager.categories();
+		return PagerUtil.page(deviceManager.categories());
 	}
 	
 	public Pager<DeviceInfo> devices(DevicesParam param) {
