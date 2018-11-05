@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.UserDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.UsersParam" resultType="org.eep.common.bean.model.UserInfo">
+		SELECT 
+			a.id,
+			a.uname,
+			a.avatar,
+			b.region,
+			a.created,
+			a.updated,
+			a.nickname,
+			c.name regionName
+		FROM 
+			user a
+		LEFT JOIN 
+			user_region b
+		ON 
+			a.id=b.uid
+		LEFT JOIN
+			sys_region c
+		ON
+			b.region=c.id
+		<where>
+			<if test="null != id">
+				a.id=#{id}
+			</if>
+			<if test="null != min">
+				<![CDATA[ AND b.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND b.region <= #{max} ]]>
+			</if>
+			<if test="null != uname">
+				AND a.`uname` LIKE concat(concat('%',#{uname}),'%')
+			</if>
+			<if test="null != nickname">
+				AND a.`nickname` LIKE concat(concat('%',#{nickname}),'%')
+			</if>
+		</where>
+	</select>
+</mapper>

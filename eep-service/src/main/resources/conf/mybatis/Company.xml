@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.CompanyDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.CompaniesParam" resultType="org.eep.common.bean.model.CompanyInfo">
+		SELECT 
+			a.*,
+			b.name region_name
+		FROM 
+			company a
+		LEFT JOIN
+			sys_region b
+		ON
+			a.region=b.id
+		<where>
+			<if test="null != id">
+				a.id=#{id}
+			</if>
+			<if test="null != min">
+				<![CDATA[ AND a.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND a.region <= #{max} ]]>
+			</if>
+			<if test="null != type">
+				AND a.type=#{type}
+			</if>
+			<if test="null != name">
+				AND a.`name` LIKE concat(concat('%',#{name}),'%')
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.OperatorDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.OperatorsParam" resultType="org.eep.common.bean.model.OperatorInfo">
+		SELECT 
+			c.*, 
+			IFNULL(d.expire_time, 0) cer_expire 
+		FROM 
+			operator c 
+		LEFT JOIN
+			(
+			SELECT 
+				b.* 
+			FROM
+				(
+				SELECT 
+					SUBSTRING_INDEX(GROUP_CONCAT(id ORDER BY expire_time DESC), ',', 1) id 
+				FROM 
+					operator_cert 
+				GROUP BY 
+					operator_id
+				) a 
+			LEFT JOIN 
+				operator_cert b 
+			ON 
+				a.id=b.id
+			) d 
+		ON 
+			c.id=d.operator_id
+		<where>
+			<if test="null != sex">
+				c.sex=#{sex}
+			</if>
+			<if test="null != id">
+				AND c.id=#{id}
+			</if>
+			<if test="null != cid">
+				AND c.cid=#{cid}
+			</if>
+		</where>
+	</select>
+</mapper>
