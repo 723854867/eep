@@ -18,6 +18,7 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
+import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorCertsParam;
 import org.eep.common.bean.param.OperatorsParam;
 import org.eep.mybatis.EntityGenerator;
@@ -137,6 +138,15 @@ public class CompanyController {
 	@RequestMapping("operator/certs")
 	public Object operatorCerts(@RequestBody @Valid OperatorCertsParam param) {
 		return companyService.operatorCerts(param);
+	}
+	
+	/**
+	 * 自查自纠列表
+	 */
+	@ResponseBody
+	@RequestMapping("introspect/list")
+	public Object operatorCerts(@RequestBody @Valid IntrospectParam param) {
+		return companyService.introspectList(param);
 	}
 	
 	/**

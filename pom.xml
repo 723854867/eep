@@ -102,9 +102,8 @@
 
 	<modules>
 		<module>eep-web</module>
-		<module>eep-soa</module>
 		<module>eep-sync</module>
 		<module>eep-common</module>
-    <module>eep-service</module>
+    	<module>eep-service</module>
   </modules>
 </project>
