@@ -10,11 +10,13 @@ import org.eep.common.bean.entity.OperatorCert;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.model.CompanyInfo;
+import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
+import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.CompanyDao;
@@ -103,5 +105,9 @@ public class CompanyManager {
 	
 	public List<OperatorInfo> operators(OperatorsParam param) { 
 		return operatorDao.list(param);
+	}
+
+	public List<IntrospectInfo> introspects(IntrospectParam param) {
+		return introspectDao.introspects(param);
 	}
 }

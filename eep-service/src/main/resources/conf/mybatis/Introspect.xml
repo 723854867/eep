@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.IntrospectDao" >
+
+	<select id="introspects" parameterType="org.eep.common.bean.param.IntrospectParam" resultType="org.eep.common.bean.model.IntrospectInfo">
+		SELECT 
+			a.id,
+			b.name,
+			a.legal_person,
+			a.filler,
+			a.created,
+			a.filler_phone
+		FROM 
+			introspect a
+		LEFT JOIN
+			company b
+		ON
+			a.cid=b.id
+		<where>
+			<if test="null != name">
+				b.`name` LIKE concat(concat('%',#{name}),'%')
+			</if>
+		
+		</where>
+	</select>
+</mapper>
