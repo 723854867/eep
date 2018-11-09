@@ -20,7 +20,6 @@
 			<if test="null != name">
 				b.`name` LIKE concat(concat('%',#{name}),'%')
 			</if>
-		
 		</where>
 	</select>
 </mapper>

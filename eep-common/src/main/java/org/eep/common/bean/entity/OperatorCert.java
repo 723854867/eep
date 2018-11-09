@@ -2,6 +2,7 @@ package org.eep.common.bean.entity;
 
 import javax.persistence.Id;
 
+import org.eep.common.bean.enums.AuditType;
 import org.rubik.bean.core.Identifiable;
 
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class OperatorCert implements Identifiable<String> {
 	
 	@Id
 	private String id;
+	private String cid;
 	// 作业种类
 	private String type;
 	private int updated;
@@ -28,8 +30,6 @@ public class OperatorCert implements Identifiable<String> {
 	private String certno;
 	// 有效日期
 	private int expireTime;
-	// 资质类型
-	private String category;
 	// 批准日期
 	private int approvalTime;
 	// 作业人员编号
@@ -38,6 +38,8 @@ public class OperatorCert implements Identifiable<String> {
 	private String examAgency;
 	// 发证机构
 	private String issueAgency;
+	// 资质类型
+	private AuditType auditType;
 
 	@Override
 	public String key() {

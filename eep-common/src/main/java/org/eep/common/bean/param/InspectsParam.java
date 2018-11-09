@@ -10,20 +10,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UsersParam extends Param {
+public class InspectsParam extends Param {
 
-	private static final long serialVersionUID = -1832478802667861947L;
+	private static final long serialVersionUID = 1057324503120177302L;
 
-	@Min(1)
-	private Long id;
 	@Null
 	private Long min;
 	@Null
 	private Long max;
+	private String cid;
+	private String rid;
 	@Min(1)
 	private Long region;
-	private String uname;
-	private String nickname;
+	private String cname;
+	private String rname;
 	
 	@Override
 	public void verify() {

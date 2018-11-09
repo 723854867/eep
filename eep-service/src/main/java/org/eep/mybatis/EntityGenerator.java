@@ -2,22 +2,28 @@ package org.eep.mybatis;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.bean.entity.Company;
+import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.InspectDevice;
 import org.eep.common.bean.entity.Introspect;
+import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.entity.UserRegion;
 import org.eep.common.bean.entity.UserToken;
+import org.eep.common.bean.enums.AlertType;
 import org.eep.common.bean.enums.EmployeeState;
+import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.ResourceType;
+import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.LoginParam;
+import org.eep.common.bean.param.RectifyNoticeCreateParam;
 import org.eep.common.bean.param.RegionCreateParam;
 import org.eep.common.bean.param.UserCreateParam;
 import org.rubik.util.common.DateUtil;
@@ -155,6 +161,44 @@ public class EntityGenerator {
 		DeviceCategory instance = new DeviceCategory();
 		instance.setCode(param.getCode());
 		instance.setName(param.getName());
+		return instance;
+	}
+	
+	public static final Alert newAlert(String cid, AlertType type, WarnLevel warnLevel, String deviceId) {
+		Alert instance = new Alert();
+		instance.setCid(cid);
+		instance.setType(type);
+		instance.setDeviceId(deviceId);
+		instance.setWarnLevel(warnLevel);
+		instance.setCreated(DateUtil.current());
+		return instance;
+	}
+	
+	public static final Alert newAlert(String cid, AlertType type, WarnLevel warnLevel, long rectifyId) {
+		Alert instance = new Alert();
+		instance.setCid(cid);
+		instance.setType(type);
+		instance.setRectifyId(rectifyId);
+		instance.setWarnLevel(warnLevel);
+		instance.setDeviceId(StringUtil.EMPTY);
+		instance.setCreated(DateUtil.current());
+		return instance;
+	}
+	
+	public static final RectifyNotice newRectifyNoticeCreate(RectifyNoticeCreateParam param) {
+		RectifyNotice instance = new RectifyNotice();
+		instance.setCid(param.getCid());
+		instance.setProblem(param.getProblem());
+		instance.setMeasure(param.getMeasure());
+		instance.setDeregulation(param.getDeregulation());
+		instance.setProcessBasis(param.getProcessBasis());
+		instance.setCommitter(param.requestor().id());
+		instance.setClosingTime(param.getClosingTime());
+		instance.setState(RectifyState.NEWLY);
+		instance.setWarnLevel(param.getWarnLevel());
+		int time = DateUtil.current();
+		instance.setCreated(time);
+		instance.setUpdated(time);
 		return instance;
 	}
 }

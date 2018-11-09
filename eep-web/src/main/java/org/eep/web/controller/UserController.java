@@ -57,6 +57,7 @@ public class UserController {
 	public Object listArea(@RequestBody @Valid UsersParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
 		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return userService.list(param);
 	}
 	

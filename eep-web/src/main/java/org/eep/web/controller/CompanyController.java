@@ -15,12 +15,15 @@ import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.Visitor;
+import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorCertsParam;
 import org.eep.common.bean.param.OperatorsParam;
+import org.eep.common.bean.param.RectifyNoticeCreateParam;
+import org.eep.common.bean.param.RectifyNoticesParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.service.CompanyService;
 import org.eep.service.RegionService;
@@ -29,6 +32,7 @@ import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Result;
+import org.rubik.bean.core.param.LidParam;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.KeyUtil;
 import org.rubik.web.Uploader;
@@ -145,7 +149,19 @@ public class CompanyController {
 	 */
 	@ResponseBody
 	@RequestMapping("introspect/list")
-	public Object operatorCerts(@RequestBody @Valid IntrospectParam param) {
+	public Object introspects(@RequestBody @Valid IntrospectParam param) {
+		return companyService.introspectList(param);
+	}
+	
+	/**
+	 * 自查自纠列表(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("introspect/list/use")
+	public Object introspectsUse(@RequestBody @Valid IntrospectParam param) {
+		Visitor visitor = param.requestor();
+		Assert.isTrue(visitor.getCompany().getType() == CompanyType.USE, Code.FORBID);
+		param.setCid(visitor.getCompany().getId());
 		return companyService.introspectList(param);
 	}
 	
@@ -187,5 +203,77 @@ public class CompanyController {
 		}
 		companyService.introspectUpload(introspect, resources);
 		return Result.ok();
+	}
+	
+	/**
+	 * 整改列表(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("rectify/notice/list/area")
+	public Object rectifyNoticesArea(@RequestBody @Valid RectifyNoticesParam param) { 
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		return companyService.rectifyNotices(param);
+	}
+	
+	/**
+	 * 整改列表(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("rectify/notice/list/use")
+	public Object rectifyNoticesUse(@RequestBody @Valid RectifyNoticesParam param) { 
+		Visitor visitor = param.requestor();
+		Company company = visitor.getCompany();
+		param.setCname(null);
+		param.setCid(company.getId());
+		return companyService.rectifyNotices(param);
+	}
+	
+	/**
+	 * 添加整改通知
+	 */
+	@ResponseBody
+	@RequestMapping("rectify/notice/create")
+	public Object rectifyNoticeCreate(@RequestBody @Valid RectifyNoticeCreateParam param) { 
+		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
+		regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+		return companyService.rectifyNoticeCreate(param);
+	}
+	
+	/**
+	 * 完成整改
+	 */
+	@ResponseBody
+	@RequestMapping("rectify/notice/finish")
+	public Object rectifyNoticeFinish(@RequestBody @Valid LidParam param) { 
+		companyService.rectifyNoticeFinish(param);
+		return Result.ok();
+	}
+	
+	/**
+	 * 首页统计(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("alert/statistic/area")
+	public Object alertStatisticArea(@RequestBody @Valid AlertStatisticParam param) { 
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		return companyService.alertStatistic(param);
+	}
+	
+	/**
+	 * 首页统计(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("alert/statistic/use")
+	public Object alertStatisticUse(@RequestBody @Valid AlertStatisticParam param) { 
+		Visitor visitor = param.requestor();
+		Company company = visitor.getCompany();
+		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
+		param.setCid(company.getId());
+		return companyService.alertStatistic(param);
 	}
 }

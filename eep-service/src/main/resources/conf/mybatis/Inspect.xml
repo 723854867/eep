@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.InspectDao" >
+
+	<resultMap id="resourceMap" type="org.eep.common.bean.entity.Resource">
+		<id property="id" column="resource_id"/>
+		<result property="url" column="resource_url"/>
+		<result property="name" column="resource_name"/>
+		<result property="priority" column="resource_priority"/>
+	</resultMap>
+	
+	<resultMap id="deviceMap" type="org.eep.common.bean.entity.Device">
+		<id property="id" column="device_id"/>
+		<result property="name" column="device_name"/>
+	</resultMap>
+
+	<resultMap id="detailMap" type="org.eep.common.bean.model.InspectDetail">
+		<id property="id" column="id"/>
+		<result property="cid" column="cid"/>
+		<result property="rid" column="rid"/>
+		<result property="cname" column="cname"/>
+		<result property="rname" column="rname"/>
+		<result property="time" column="created"/>
+		<result property="content" column="content"/>
+		<collection property="devices" resultMap="deviceMap" />
+		<collection property="resources" resultMap="resourceMap" />
+	</resultMap>
+
+	<select id="list" parameterType="org.eep.common.bean.param.InspectsParam" resultType="org.eep.common.bean.model.InspectInfo">
+		SELECT 
+			a.`id`,
+			a.`cid`,
+			a.`rid`,
+			a.`created` time,
+			b.`name` cname, 
+			c.`name` rname 
+		FROM 
+			inspect a 
+		LEFT JOIN 
+			company b 
+		ON 
+			a.`cid`=b.`id`
+		LEFT JOIN 
+			company c 
+		ON 
+			a.`rid`=c.`id` 
+		<where>
+			<if test="null != cid">
+				a.`cid`=#{cid}
+			</if>
+			<if test="null != rid">
+				AND a.`rid`=#{rid}
+			</if>
+			<if test="null != min">
+				<![CDATA[ AND c.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND c.region <= #{max} ]]>
+			</if>
+			<if test="null != cname">
+				AND b.`name` LIKE concat(concat('%',#{cname}),'%')
+			</if>
+			<if test="null != rname">
+				AND c.`name` LIKE concat(concat('%',#{rname}),'%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="detail" resultMap="detailMap" parameterType="long">
+		SELECT 
+			a.`id`,
+			a.`cid`,
+			a.`rid`,
+			a.`created`,
+			b.`name` cname, 
+			c.`name` rname,
+			a.`content`,
+			d.id resource_id, 
+			d.`url`resource_url,
+			d.`name` resource_name,
+			d.`priority` resource_priority,
+			e.`device_id`, 
+			f.`name` device_name
+		FROM 
+			inspect a 
+		LEFT JOIN 
+			company b 
+		ON 
+			a.`cid`=b.`id` 
+		LEFT JOIN 
+			company c 
+		ON 
+			a.`rid`=c.`id`
+		LEFT JOIN 
+			resource d 
+		ON 
+			a.`id`=d.`owner`
+		LEFT JOIN 
+			inspect_device e 
+		ON 
+			a.`id`=e.inspect_id
+		LEFT JOIN 
+			device f 
+		ON 
+			e.`device_id`=f.`id`
+		WHERE 
+			d.`type`=1
+		AND
+			a.`id`=#{id}
+	</select>
+</mapper>

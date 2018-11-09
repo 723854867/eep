@@ -40,6 +40,10 @@ public interface Codes {
 	public static final Code REPAIR_DEVICE_MAXIMUM		= Code.create("code.repair.device.maximum");
 	// 父级地区不存在
 	public static final Code REGION_PARENT_NOT_EXIST	= Code.create("code.region.parent.not.exist");
+	// 整改通知不存在
+	public static final Code RECTIFY_NOTICE_NOT_EXIST	= Code.create("code.rectify.notice.not.exist");
 	// 设备类型不存在
 	public static final Code DEVICE_CATEGORY_NOT_EXIST	= Code.create("code.device.category.not.exist");
+	// 设备状态同步中
+	public static final Code DEVICE_ALERT_TASK_RUNNING	= Code.create("code.device.alert.task.running");
 }

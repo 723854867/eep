@@ -30,4 +30,39 @@
 			</if>
 		</where>
 	</select>
+	
+	<select id="alertStatistic" parameterType="org.eep.common.bean.param.AlertStatisticParam" resultType="org.eep.common.bean.model.AlertStatistic">
+		SELECT 
+			warn_level, 
+			SUM(num) num
+		FROM
+			(SELECT 
+				b.num,
+				b.warn_level
+			FROM 
+				company a 
+			LEFT JOIN
+				(SELECT 
+					cid, warn_level, COUNT(*) num 
+				FROM 
+					alert 
+				GROUP BY 
+					cid, warn_level
+				) b 
+			ON 
+				a.`id`=b.`cid`
+			<where>
+				<if test="null != cid">
+					a.id=#{cid}
+				</if>
+				<if test="null != min">
+					<![CDATA[ AND a.region >= #{min} ]]>
+				</if>
+				<if test="null != max">
+					<![CDATA[ AND a.region <= #{max} ]]>
+				</if>
+			</where>
+			) c 
+		GROUP BY warn_level
+	</select>
 </mapper>

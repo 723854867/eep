@@ -2,25 +2,30 @@ package org.eep.service;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
+import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
+import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
+import org.eep.common.bean.model.RectifyNoticeInfo;
 import org.eep.common.bean.model.Visitor;
+import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorCertsParam;
 import org.eep.common.bean.param.OperatorsParam;
+import org.eep.common.bean.param.RectifyNoticeCreateParam;
+import org.eep.common.bean.param.RectifyNoticesParam;
 import org.eep.manager.CompanyManager;
 import org.rubik.bean.core.model.Pager;
+import org.rubik.bean.core.param.LidParam;
 import org.rubik.mybatis.PagerUtil;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.springframework.stereotype.Service;
@@ -53,6 +58,18 @@ public class CompanyService {
 		companyManager.introspectUpload(introspect, resources);
 	}
 	
+	public RectifyNotice rectifyNoticeCreate(RectifyNoticeCreateParam param) {
+		return companyManager.rectifyNoticeCreate(param);
+	}
+	
+	public void rectifyNoticeFinish(LidParam param) { 
+		companyManager.rectifyNoticeFinish(param);
+	}
+	
+	public void alertCheck() { 
+		companyManager.alertCheck();
+	}
+	
 	public Company company(String id) {
 		return companyManager.company(id);
 	}
@@ -79,5 +96,14 @@ public class CompanyService {
 	public Pager<IntrospectInfo> introspectList(IntrospectParam param) {
 		PageHelper.startPage(param.getPage(), param.getPageSize());
 		return PagerUtil.page(companyManager.introspects(param));
+	}
+	
+	public List<AlertStatistic> alertStatistic(AlertStatisticParam param) {
+		return companyManager.alertStatistic(param);
+	}
+	
+	public Pager<RectifyNoticeInfo> rectifyNotices(RectifyNoticesParam param) { 
+		PageHelper.startPage(param.getPage(), param.getPageSize());
+		return PagerUtil.page(companyManager.rectifyNotices(param));
 	}
 }

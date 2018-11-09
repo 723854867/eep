@@ -11,6 +11,7 @@ public class IntrospectParam extends Param {
 
 	private static final long serialVersionUID = -7536352372805893719L;
 	
+	private String cid;
 	private String name;
 	
 	@Override

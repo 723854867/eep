@@ -8,6 +8,7 @@ import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.LogExamine;
 import org.eep.common.bean.entity.Operator;
 import org.eep.common.bean.entity.OperatorCert;
+import org.eep.common.bean.enums.AuditType;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.Sex;
 import org.eep.sync.bean.entity.ViewTsCodeEqusortcode;
@@ -131,14 +132,15 @@ public class EntityGenerator {
 		return instance;
 	}
 	
-	public static final OperatorCert newOperatorCert(ViewTsPeroperatorcert temp) {
+	public static final OperatorCert newOperatorCert(ViewTsPeroperatorcert temp, Operator operator) {
 		OperatorCert instance = new OperatorCert();
 		instance.setId(temp.getSid());
+		instance.setCid(operator.getCid());
 		instance.setState(temp.getState());
 		instance.setType(temp.getWorktype());
-		instance.setCategory(temp.getApplycategory());
 		instance.setIssueAgency(temp.getIsscerorgname());
 		instance.setOperatorId(temp.getSidBaseperoperator());
+		instance.setAuditType(AuditType.match(temp.getApplycategory()));
 		instance.setExpireTime((int) (temp.getExpdate().getTime() / 1000));
 		instance.setUpdated((int) (temp.getUpdatedate().getTime() / 1000));
 		instance.setApprovalTime((int) (temp.getPasdate().getTime() / 1000));

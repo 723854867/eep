@@ -14,16 +14,21 @@ import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
+import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.DevicesParam;
+import org.eep.common.bean.param.InspectsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.service.CompanyService;
 import org.eep.service.DeviceService;
+import org.eep.service.RegionService;
+import org.eep.util.RegionUtil;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Result;
+import org.rubik.bean.core.param.LidParam;
 import org.rubik.bean.core.param.Param;
 import org.rubik.bean.core.param.SidParam;
 import org.rubik.soa.config.api.RubikConfigService;
@@ -41,6 +46,8 @@ public class DeviceController {
 	
 	@javax.annotation.Resource
 	private Uploader uploader;
+	@javax.annotation.Resource
+	private RegionService regionService;
 	@javax.annotation.Resource
 	private DeviceService deviceService;
 	@javax.annotation.Resource
@@ -62,13 +69,65 @@ public class DeviceController {
 		Assert.isTrue(visitor.getEmployee().getCid().equals(param.getCid()), Code.FORBID);
 		return deviceService.devices(param);
 	}
+
+	/**
+	 * 维保记录列表(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("inspects/area")
+	public Object inspectsArea(@RequestBody @Valid InspectsParam param) {
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		return deviceService.inspects(param);
+	}
+	
+	/**
+	 * 维保记录列表(维保单位)
+	 */
+	@ResponseBody
+	@RequestMapping("inspects/repair")
+	public Object inspectsRepair(@RequestBody @Valid InspectsParam param) {
+		Visitor visitor = param.requestor();
+		Assert.isTrue(visitor.getCompany().getType() == CompanyType.REPAIR, Code.FORBID);
+		param.setRid(visitor.getCompany().getId());
+		return deviceService.inspects(param);
+	}
+	
+	/**
+	 * 维保记录详情页(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("inspect/detail")
+	public Object inspectDetail(@RequestBody @Valid LidParam param) {
+		InspectDetail detail = deviceService.inspectDetail(param.getId());
+		if (null != detail) {		// 检测区域权限
+			Company company = companyService.company(detail.getCid());
+			regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+		}
+		return detail;
+	}
+	
+	/**
+	 * 维保记录详情页(维保单位)
+	 */
+	@ResponseBody
+	@RequestMapping("inspect/detail/repair")
+	public Object inspectDetailRepair(@RequestBody @Valid LidParam param) {
+		Visitor visitor = param.requestor();
+		Company company = visitor.getCompany();
+		Assert.isTrue(company.getType() == CompanyType.REPAIR, Code.FORBID);
+		InspectDetail detail = deviceService.inspectDetail(param.getId());
+		Assert.isTrue(detail.getRid().equals(company.getId()));
+		return detail;
+	}
 	
 	/**
 	 * 添加维保记录
 	 */
 	@ResponseBody
-	@RequestMapping("repair/create")
-	public Object repairCreate(RepairCreateParam param) {
+	@RequestMapping("inspect/create")
+	public Object inspectCreate(RepairCreateParam param) {
 		Visitor visitor = param.requestor();
 		// 上传用户必须属于维保单位
 		Assert.isTrue(visitor.getCompany().getType() == CompanyType.REPAIR, Code.FORBID);
@@ -98,7 +157,7 @@ public class DeviceController {
 			Resource resource = EntityGenerator.newResource(file.getSize(), url, path, name, ResourceType.DEVICE_REPAIR, null, ++priority);
 			resources.add(resource);
 		}
-		deviceService.repairCreate(param.getCid(), company.getId(), param.getContent(), visitor.id(), param.getDevices(), resources);
+		deviceService.inspectCreate(param.getCid(), company.getId(), param.getContent(), visitor.id(), param.getDevices(), resources);
 		return Result.ok();
 	}
 	

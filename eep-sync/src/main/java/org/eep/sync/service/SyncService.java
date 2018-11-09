@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.eep.common.Codes;
 import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
@@ -14,6 +15,7 @@ import org.eep.common.bean.entity.LogExamine;
 import org.eep.common.bean.entity.Operator;
 import org.eep.common.bean.entity.OperatorCert;
 import org.eep.common.bean.entity.SysRegion;
+import org.eep.manager.DeviceManager;
 import org.eep.mybatis.dao.CompanyDao;
 import org.eep.mybatis.dao.DeviceCategoryDao;
 import org.eep.mybatis.dao.DeviceDao;
@@ -21,7 +23,6 @@ import org.eep.mybatis.dao.LogExamineDao;
 import org.eep.mybatis.dao.OperatorCertDao;
 import org.eep.mybatis.dao.OperatorDao;
 import org.eep.mybatis.dao.SysRegionDao;
-import org.eep.sync.SyncUtil;
 import org.eep.sync.bean.entity.ViewTsEquinspect;
 import org.eep.sync.bean.entity.ViewTsEquipment;
 import org.eep.sync.bean.entity.ViewTsOrganization;
@@ -34,6 +35,11 @@ import org.eep.sync.mybatis.dao.ViewTsEquipmentDao;
 import org.eep.sync.mybatis.dao.ViewTsOrganizationDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorcertDao;
+import org.rubik.bean.core.Assert;
+import org.rubik.bean.core.model.MultiListMap;
+import org.rubik.redis.Locker;
+import org.rubik.soa.config.api.RubikConfigService;
+import org.rubik.util.common.CollectionUtil;
 import org.rubik.util.common.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service("syncService")
 public class SyncService{
 	
+	private static final String DEVICE_ALERT_CHECK_KEY			= "string:device:alert:check";
+	
+	@Resource
+	private Locker locker;
 	@Resource
 	private DeviceDao deviceDao;
 	@Resource
@@ -55,11 +65,15 @@ public class SyncService{
 	@Resource
 	private LogExamineDao logExamineDao;
 	@Resource
+	private DeviceManager deviceManager;
+	@Resource
 	private OperatorCertDao operatorCertDao;
 	@Resource
 	private DeviceCategoryDao deviceCategoryDao;
 	@Resource
 	private ViewTsEquipmentDao viewTsEquipmentDao;
+	@Resource
+	private RubikConfigService rubikConfigService;
 	@Resource
 	private ViewTsEquinspectDao viewTsEquinspectDao;
 	@Resource
@@ -67,29 +81,37 @@ public class SyncService{
 	@Resource
 	private ViewTsOrganizationDao viewTsOrganizationDao;
 	@Resource
-	private ViewTsPeroperatorcertDao viewTsPeroperatorcertDao;
-	@Resource
 	private ViewTsCodeEqusortcodeDao viewTsCodeEqusortcodeDao;
+	@Resource
+	private ViewTsPeroperatorcertDao viewTsPeroperatorcertDao;
+
 	private Map<String, Device> devices = new HashMap<String, Device>();
 	private Map<String, Company> companies = new HashMap<String, Company>();
 	private Map<String, Operator> operators = new HashMap<String, Operator>();
 	private Map<String, DeviceCategory> categories = new HashMap<String, DeviceCategory>();
+	private MultiListMap<String, OperatorCert> operatorCerts = new MultiListMap<String, OperatorCert>();
 
 	@Transactional
 	public void sync() {
-		log.info("开始数据同步！");
-		deviceDao.deleteAll();
-		companyDao.deleteAll();
-		operatorDao.deleteAll();
-		logExamineDao.deleteAll();
-		operatorCertDao.deleteAll();
-		_syncCompany();
-		_syncDeviceCategory();
-		_syncDevice();
-		_syncOperator();
-		_syncExamine();
-		_syncOperatorCert();
-		log.info("数据同步完成！");
+		String lockId = locker.tryLock(DEVICE_ALERT_CHECK_KEY, 3600000);
+		Assert.hasText(lockId, Codes.DEVICE_ALERT_TASK_RUNNING);
+		try {
+			log.info("开始数据同步！");
+			deviceDao.deleteAll();
+			companyDao.deleteAll();
+			operatorDao.deleteAll();
+			logExamineDao.deleteAll();
+			operatorCertDao.deleteAll();
+			_syncCompany();
+			_syncDeviceCategory();
+			_syncDevice();
+			_syncOperator();
+			_syncExamine();
+			_syncOperatorCert();
+			log.info("数据同步完成！");
+		} finally {
+			locker.releaseLock(DEVICE_ALERT_CHECK_KEY, lockId);
+		}
 	}
 	
 	private void _syncCompany() { 
@@ -112,7 +134,7 @@ public class SyncService{
 			} else 
 				log.warn("单位 - {} 类型 - {} 不识别，不迁移该单位！", organization.getSid(), organization.getOrgtype());
 		});
-		SyncUtil.batchReplace(new ArrayList<Company>(companies.values()), l -> companyDao.replaceCollection(l));
+		CollectionUtil.dispersed(new ArrayList<Company>(companies.values()), l -> companyDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条单位数据！", companies.size());
 	}
 	
@@ -122,7 +144,7 @@ public class SyncService{
 			DeviceCategory category = EntityGenerator.newDeviceCategory(code);
 			categories.put(category.getCode(), category);
 		});
-		SyncUtil.batchReplace(new ArrayList<DeviceCategory>(categories.values()), l -> deviceCategoryDao.replaceCollection(l));
+		CollectionUtil.dispersed(new ArrayList<DeviceCategory>(categories.values()), l -> deviceCategoryDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条设备类型数据！", categories.size());
 	}
 	
@@ -143,7 +165,7 @@ public class SyncService{
 			} else 
 				log.warn("设备 {} 对应使用单位 - {}不存在，不迁移该条数据！", equip.getSid(), equip.getSidBaseorgmain());
 		});
-		SyncUtil.batchReplace(new ArrayList<Device>(devices.values()), l -> deviceDao.replaceCollection(l));
+		CollectionUtil.dispersed(new ArrayList<Device>(devices.values()), l -> deviceDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条设备数据！", devices.size());
 	}
 	
@@ -158,7 +180,7 @@ public class SyncService{
 			} else
 				log.warn("作业人员 {} 对应使用单位 - {}不存在，不迁移该条数据！", temp.getSid(), temp.getSidBaseorgmain());
 		});
-		SyncUtil.batchReplace(new ArrayList<Operator>(operators.values()), l -> operatorDao.replaceCollection(l));
+		CollectionUtil.dispersed(new ArrayList<Operator>(operators.values()), l -> operatorDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条作业人员数据！", companies.size());
 	}
 	
@@ -168,12 +190,13 @@ public class SyncService{
 		List<ViewTsEquinspect> list = viewTsEquinspectDao.selectList();
 		list.forEach(temp -> {
 			Device device = devices.get(temp.getSidBaseequmain());
-			if (null != device)
-				li.add(EntityGenerator.newLogExamine(temp));
-			else
+			if (null != device) {
+				LogExamine examine = EntityGenerator.newLogExamine(temp);
+				li.add(examine);
+			} else
 				log.warn("设备检验日志 {} 对应设备 - {}不存在，不迁移该条数据！", temp.getSid(), temp.getSidBaseequmain());
 		});
-		SyncUtil.batchReplace(li, l -> logExamineDao.replaceCollection(l));
+		CollectionUtil.dispersed(li, l -> logExamineDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条设备检验数据！", companies.size());
 	}
 	
@@ -183,12 +206,14 @@ public class SyncService{
 		List<ViewTsPeroperatorcert> list = viewTsPeroperatorcertDao.selectList();
 		list.forEach(temp -> {
 			Operator operator = operators.get(temp.getSidBaseperoperator());
-			if (null != operator)
-				li.add(EntityGenerator.newOperatorCert(temp));
-			else
+			if (null != operator) {
+				OperatorCert cert = EntityGenerator.newOperatorCert(temp, operator);
+				li.add(cert);
+				operatorCerts.add(operator.getCid(), cert);
+			} else
 				log.warn("作业人员资质 {} 对应作业人员 - {}不存在，不迁移该条数据！", temp.getSid(), temp.getSidBaseperoperator());
 		});
-		SyncUtil.batchReplace(li, l -> operatorCertDao.replaceCollection(l));
+		CollectionUtil.dispersed(li, l -> operatorCertDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条作业人员资质数据！", companies.size());
 	}
 }
