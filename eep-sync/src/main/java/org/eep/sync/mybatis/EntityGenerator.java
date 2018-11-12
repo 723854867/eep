@@ -146,8 +146,9 @@ public class EntityGenerator {
 		instance.setApprovalTime((int) (temp.getPasdate().getTime() / 1000));
 		instance.setLevel(StringUtil.hasText(temp.getWorklevel()) ? temp.getWorklevel() : StringUtil.EMPTY);
 		instance.setCertno(StringUtil.hasText(temp.getStudentno()) ? temp.getStudentno() : StringUtil.EMPTY);
-		instance.setItems(StringUtil.hasText(temp.getAuthworkitem()) ? temp.getAuthworkitem() : StringUtil.EMPTY);
+		instance.setWorkItems(StringUtil.hasText(temp.getWorkitem()) ? temp.getWorkitem() : StringUtil.EMPTY);
 		instance.setExamAgency(StringUtil.hasText(temp.getExaorgname()) ? temp.getExaorgname() : StringUtil.EMPTY);
+		instance.setAuthItems(StringUtil.hasText(temp.getAuthworkitem()) ? temp.getAuthworkitem() : StringUtil.EMPTY);
 		return instance;
 	}
 	

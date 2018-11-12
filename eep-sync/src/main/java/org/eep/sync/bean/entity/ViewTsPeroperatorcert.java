@@ -25,6 +25,8 @@ public class ViewTsPeroperatorcert implements Identifiable<String> {
 	private String worktype;
 	// 作业级别
 	private String worklevel;
+	// 作业项目
+	private String workitem;
 	// 批准项目明细
 	private String authworkitem;
 	// 考核机构

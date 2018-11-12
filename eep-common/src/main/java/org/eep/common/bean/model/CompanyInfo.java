@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.eep.common.bean.enums.CompanyType;
+import org.eep.common.bean.enums.WarnLevel;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,10 +21,12 @@ public class CompanyInfo implements Serializable {
 	private String attr;
 	private int updated;
 	private String name;
+	private int deviceNum;
 	private String address;
 	private String contacts;
 	private CompanyType type;
 	private String regionName;
+	private WarnLevel warnLevel;
 	private BigDecimal latitude;
 	private BigDecimal longitude;
 	private String contactsPhone;

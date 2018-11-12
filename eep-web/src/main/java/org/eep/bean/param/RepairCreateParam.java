@@ -13,6 +13,7 @@ import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.param.Param;
 import org.rubik.util.common.CollectionUtil;
+import org.rubik.util.common.DateUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
@@ -26,6 +27,8 @@ public class RepairCreateParam extends Param {
 
 	// 使用单位编号
 	private String cid;
+	// 下次维保时间
+	private long nextTime;
 	private String content;
 	private Set<String> devices;
 	@DecimalMax("90")
@@ -45,6 +48,7 @@ public class RepairCreateParam extends Param {
 		Assert.notNull(longitude, Code.PARAM_ERR, "longitude miss");
 		Assert.isTrue(!CollectionUtil.isEmpty(files), Code.PARAM_ERR, "files is empty");
 		Assert.isTrue(!CollectionUtil.isEmpty(devices), Code.PARAM_ERR, "devices is empty");
+		Assert.isTrue(nextTime > DateUtil.current(), "next inspect time must large than current time");
 		Assert.isTrue(latitude.compareTo(BigDecimal.valueOf(90)) <= 0, Code.PARAM_ERR, "latitude value large than 90");
 		Assert.isTrue(latitude.compareTo(BigDecimal.valueOf(-90)) >= 0, Code.PARAM_ERR, "latitude value less than -90");
 		Assert.isTrue(longitude.compareTo(BigDecimal.valueOf(180)) <= 0, Code.PARAM_ERR, "longitude value large than 180");

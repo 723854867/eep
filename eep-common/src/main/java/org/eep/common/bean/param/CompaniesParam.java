@@ -4,6 +4,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
 
 import org.eep.common.bean.enums.CompanyType;
+import org.eep.common.bean.enums.WarnLevel;
 import org.rubik.bean.core.param.Param;
 
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class CompaniesParam extends Param {
 	private Long region;
 	private String name;
 	private CompanyType type;
+	private WarnLevel warnLevel;
 	
 	@Override
 	public void verify() {

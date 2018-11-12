@@ -22,14 +22,16 @@ public class OperatorCert implements Identifiable<String> {
 	private int updated;
 	// 作业级别
 	private String level;
-	// 批准项目明细
-	private String items;
 	// 持证状态
 	private String state;
 	// 学号(证书编号)
 	private String certno;
 	// 有效日期
 	private int expireTime;
+	// 作业项目
+	private String workItems;
+	// 批准项目明细
+	private String authItems;
 	// 批准日期
 	private int approvalTime;
 	// 作业人员编号

@@ -8,6 +8,8 @@ import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.InspectDevice;
 import org.eep.common.bean.entity.Introspect;
+import org.eep.common.bean.entity.Law;
+import org.eep.common.bean.entity.LawCategory;
 import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
@@ -22,6 +24,8 @@ import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
+import org.eep.common.bean.param.LawCategoryCreateParam;
+import org.eep.common.bean.param.LawCreateParam;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.RectifyNoticeCreateParam;
 import org.eep.common.bean.param.RegionCreateParam;
@@ -196,6 +200,26 @@ public class EntityGenerator {
 		instance.setClosingTime(param.getClosingTime());
 		instance.setState(RectifyState.NEWLY);
 		instance.setWarnLevel(param.getWarnLevel());
+		int time = DateUtil.current();
+		instance.setCreated(time);
+		instance.setUpdated(time);
+		return instance;
+	}
+	
+	public static final LawCategory newLawCategory(LawCategoryCreateParam param) {
+		LawCategory instance = new LawCategory();
+		instance.setName(param.getName());
+		int time = DateUtil.current();
+		instance.setCreated(time);
+		instance.setUpdated(time);
+		return instance;
+	}
+	
+	public static final Law newLaw(LawCreateParam param) {
+		Law instance = new Law();
+		instance.setTitle(param.getTitle());
+		instance.setContent(param.getContent());
+		instance.setCategoryId(param.getCategoryId());
 		int time = DateUtil.current();
 		instance.setCreated(time);
 		instance.setUpdated(time);

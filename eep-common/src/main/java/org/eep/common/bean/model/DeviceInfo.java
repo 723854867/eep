@@ -2,6 +2,8 @@ package org.eep.common.bean.model;
 
 import java.io.Serializable;
 
+import org.eep.common.bean.enums.WarnLevel;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,6 +40,7 @@ public class DeviceInfo implements Serializable {
 	private String department;
 	private String guardLevel;
 	private String parAbstract;
+	private WarnLevel warnLevel;
 	private String safeManPhone;
 	private String contactPhone;
 	private String contactMobile;

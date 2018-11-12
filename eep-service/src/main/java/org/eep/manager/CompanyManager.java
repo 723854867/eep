@@ -152,7 +152,8 @@ public class CompanyManager {
 			notice.setUpdated(DateUtil.current());
 			notice.setState(RectifyState.NOTIFIED);
 		}
-		rectifyNoticeDao.replaceCollection(notices);
+		if (!CollectionUtil.isEmpty(notices))
+			rectifyNoticeDao.replaceCollection(notices);
 	
 		// 先清空所有的证书警告
 		query = new Query().and(Criteria.in("type", AlertType.OPERATOR_CERT_EXPIRE_LIGHT, AlertType.OPERATOR_CERT_EXPIRE_SERIOUS));

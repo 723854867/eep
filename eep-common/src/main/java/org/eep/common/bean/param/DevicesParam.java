@@ -1,5 +1,6 @@
 package org.eep.common.bean.param;
 
+import org.eep.common.bean.enums.WarnLevel;
 import org.rubik.bean.core.param.Param;
 
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class DevicesParam extends Param {
 	private String code;
 	private String cname;
 	private String model;
+	private WarnLevel warnLevel;
 	
 	@Override
 	public void verify() {

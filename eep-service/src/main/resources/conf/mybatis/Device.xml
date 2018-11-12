@@ -6,7 +6,8 @@
 		SELECT 
 			a.*,
 			b.name cname,
-			c.name category
+			c.name category,
+			IFNULL(d.warn_level, 0) warn_level
 		FROM 
 			device a
 		LEFT JOIN
@@ -17,6 +18,9 @@
 			device_category c
 		ON 
 			a.code=c.code
+		LEFT JOIN
+			(SELECT device_id, MAX(warn_level) warn_level FROM alert WHERE `type` IN(1,2,3) GROUP BY device_id) d
+		ON a.id=d.device_id
 		<where>
 			<if test="null != id">
 				a.id=#{id}
@@ -26,6 +30,9 @@
 			</if>
 			<if test="null != code">
 				AND a.code=#{code}
+			</if>
+			<if test="null != warnLevel">
+				AND d.`warn_level`=#{warnLevel}
 			</if>
 			<if test="null != name">
 				AND a.`name` LIKE concat(concat('%',#{name}),'%')

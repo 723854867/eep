@@ -6,6 +6,8 @@ public interface Codes {
 
 	// 地区已存在
 	public static final Code REGION_EXIST				= Code.create("code.region.exist");
+	// 法律法规不存在
+	public static final Code LAW_NOT_EXIST				= Code.create("code.law.not.exist");
 	// 登录密码错误
 	public static final Code PWD_LOGIN_ERR				= Code.create("code.pwd.login.err");
 	// 设备数量限制
@@ -38,6 +40,8 @@ public interface Codes {
 	public static final Code INTROSPECT_NOT_EXIST		= Code.create("code.introspect.not.exist");
 	// 设备数量超过限制
 	public static final Code REPAIR_DEVICE_MAXIMUM		= Code.create("code.repair.device.maximum");
+	// 法律法规类型不存在
+	public static final Code LAW_CATEGORY_NOT_EXIST		= Code.create("code.law.category.not.exist");
 	// 父级地区不存在
 	public static final Code REGION_PARENT_NOT_EXIST	= Code.create("code.region.parent.not.exist");
 	// 整改通知不存在

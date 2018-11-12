@@ -38,6 +38,9 @@
 			<if test="null != cid">
 				AND c.cid=#{cid}
 			</if>
+			<if test="null != name">
+				AND c.`name` LIKE concat(concat('%',#{name}),'%')
+			</if>
 		</where>
 	</select>
 </mapper>

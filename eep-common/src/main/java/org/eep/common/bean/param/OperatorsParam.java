@@ -15,6 +15,7 @@ public class OperatorsParam extends Param {
 	private Sex sex;
 	private String id;
 	private String cid;
+	private String name;
 	
 	@Override
 	public void verify() {

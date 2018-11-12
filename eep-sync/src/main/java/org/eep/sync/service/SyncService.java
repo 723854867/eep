@@ -36,7 +36,6 @@ import org.eep.sync.mybatis.dao.ViewTsOrganizationDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorcertDao;
 import org.rubik.bean.core.Assert;
-import org.rubik.bean.core.model.MultiListMap;
 import org.rubik.redis.Locker;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.CollectionUtil;
@@ -89,7 +88,6 @@ public class SyncService{
 	private Map<String, Company> companies = new HashMap<String, Company>();
 	private Map<String, Operator> operators = new HashMap<String, Operator>();
 	private Map<String, DeviceCategory> categories = new HashMap<String, DeviceCategory>();
-	private MultiListMap<String, OperatorCert> operatorCerts = new MultiListMap<String, OperatorCert>();
 
 	@Transactional
 	public void sync() {
@@ -126,6 +124,28 @@ public class SyncService{
 					organization.setAreacode("3303000000");
 				if(organization.getAreacode().equals("330327"))
 					organization.setAreacode("3303270000");
+				if (organization.getAreacode().equals("33032701"))
+					organization.setAreacode("3303270100");
+				if (organization.getAreacode().equals("33032708"))
+					organization.setAreacode("3303270800");
+				if (organization.getAreacode().equals("33032713"))
+					organization.setAreacode("3303271300");
+				if (organization.getAreacode().equals("33032715"))
+					organization.setAreacode("3303271500");
+				if (organization.getAreacode().equals("33032716"))
+					organization.setAreacode("3303271600");
+				if (organization.getAreacode().equals("33032722"))
+					organization.setAreacode("3303272200");
+				if (organization.getAreacode().equals("33032723"))
+					organization.setAreacode("3303272300");
+				if (organization.getAreacode().equals("33032724"))
+					organization.setAreacode("3303272400");
+				if (organization.getAreacode().equals("33032727"))
+					organization.setAreacode("3303272700");
+				if (organization.getAreacode().equals("33032740"))
+					organization.setAreacode("3303274000");
+				if (organization.getAreacode().equals("3303030300"))
+					organization.setAreacode("3303031100");
 				SysRegion region = regions.get(organization.getAreacode());
 				if (null == region)
 					throw new RuntimeException("未识别的行政区划代码");
@@ -186,34 +206,33 @@ public class SyncService{
 	
 	private void _syncExamine() {
 		log.info("开始同步设备检验日志数据...");
-		List<LogExamine> li = new ArrayList<LogExamine>();
+		Map<String, LogExamine> map = new HashMap<String, LogExamine>();
 		List<ViewTsEquinspect> list = viewTsEquinspectDao.selectList();
 		list.forEach(temp -> {
 			Device device = devices.get(temp.getSidBaseequmain());
 			if (null != device) {
 				LogExamine examine = EntityGenerator.newLogExamine(temp);
-				li.add(examine);
+				map.put(examine.getId(), examine);
 			} else
 				log.warn("设备检验日志 {} 对应设备 - {}不存在，不迁移该条数据！", temp.getSid(), temp.getSidBaseequmain());
 		});
-		CollectionUtil.dispersed(li, l -> logExamineDao.insertMany(l), 1000);
+		CollectionUtil.dispersed(map.values(), l -> logExamineDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条设备检验数据！", companies.size());
 	}
 	
 	private void _syncOperatorCert()  {
 		log.info("开始同步作业人员资质数据...");
-		List<OperatorCert> li = new ArrayList<OperatorCert>();
+		Map<String, OperatorCert> map = new HashMap<String, OperatorCert>();
 		List<ViewTsPeroperatorcert> list = viewTsPeroperatorcertDao.selectList();
 		list.forEach(temp -> {
 			Operator operator = operators.get(temp.getSidBaseperoperator());
 			if (null != operator) {
 				OperatorCert cert = EntityGenerator.newOperatorCert(temp, operator);
-				li.add(cert);
-				operatorCerts.add(operator.getCid(), cert);
+				map.put(cert.getId(), cert);
 			} else
 				log.warn("作业人员资质 {} 对应作业人员 - {}不存在，不迁移该条数据！", temp.getSid(), temp.getSidBaseperoperator());
 		});
-		CollectionUtil.dispersed(li, l -> operatorCertDao.insertMany(l), 1000);
+		CollectionUtil.dispersed(map.values(), l -> operatorCertDao.insertMany(l), 1000);
 		log.info("成功同步 {} 条作业人员资质数据！", companies.size());
 	}
 }
