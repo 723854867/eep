@@ -8,7 +8,7 @@
 	</appender>
 	
 	<appender name="root" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>E:/data/log/java/eep/root.log</File>
+		<File>${log.path}/root.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- rollover daily -->
 			<fileNamePattern>E:/data/log/java/eep/%d{yyyy-MM-dd}/root-%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
