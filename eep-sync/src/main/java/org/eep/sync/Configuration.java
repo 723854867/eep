@@ -23,7 +23,7 @@ import com.zaxxer.hikari.HikariDataSource;
 class Configuration {
 	
 	@Bean("sourceDbConfig")
-	public DBConfig dbConfig() {
+	public static DBConfig dbConfig() {
 		return ConfigLoader.load("classpath*:conf/source.properties").toBean(DBConfig.class, ColStyle.camel2dot);
 	}
 	
