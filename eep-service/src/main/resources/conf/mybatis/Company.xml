@@ -42,6 +42,7 @@
 				AND c.`warn_level`=#{warnLevel}
 			</if>
 		</where>
+		order by warn_level desc
 	</select>
 	
 	<select id="alertStatistic" parameterType="org.eep.common.bean.param.AlertStatisticParam" resultType="org.eep.common.bean.model.AlertStatistic">
