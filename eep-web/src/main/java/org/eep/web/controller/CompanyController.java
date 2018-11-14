@@ -118,7 +118,7 @@ public class CompanyController {
 	 * 作业人员列表
 	 */
 	@ResponseBody
-	@RequestMapping("operators")
+	@RequestMapping("operator/list")
 	public Object operators(@RequestBody @Valid OperatorsParam param) { 
 		return companyService.operators(param);
 	}
