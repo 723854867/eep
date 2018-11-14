@@ -24,6 +24,12 @@
 			<artifactId>rubik-soa-config-service</artifactId>
 			<version>${rubik.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.rubik</groupId>
+			<artifactId>rubik-soa-authority-service</artifactId>
+			<version>${rubik.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.rubik</groupId>
