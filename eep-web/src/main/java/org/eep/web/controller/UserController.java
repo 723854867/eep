@@ -3,13 +3,19 @@ package org.eep.web.controller;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.eep.bean.model.UserPrivilleges;
+import org.eep.bean.param.UserInfoParam;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.User;
+import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.model.UserInfo;
+import org.eep.common.bean.model.Visitor;
+import org.eep.common.bean.param.EmployeesParam;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
 import org.eep.common.bean.param.UsersParam;
+import org.eep.service.CompanyService;
 import org.eep.service.RegionService;
 import org.eep.service.UserService;
 import org.eep.util.RegionUtil;
@@ -30,6 +36,24 @@ public class UserController {
 	private UserService userService;
 	@Resource
 	private RegionService regionService;
+	@Resource
+	private CompanyService companyService;
+	
+	@ResponseBody
+	@RequestMapping("privilleges")
+	public Object info(@RequestBody @Valid UserInfoParam param) {
+		Visitor visitor = param.requestor();
+		User user = visitor.getUser();
+		UserPrivilleges privilleges = new UserPrivilleges(user);
+		privilleges.setRegions(regionService.regions(user.getId(), param.isRegionChain()));
+		EmployeesParam ep = new EmployeesParam();
+		ep.setUid(user.getId());
+		ep.setType(CompanyType.USE);
+		privilleges.setUses(companyService.emploees(ep).getList());
+		ep.setType(CompanyType.REPAIR);
+		privilleges.setRepairs(companyService.emploees(ep).getList());
+		return privilleges;
+	}
 
 	@ResponseBody
 	@RequestMapping("login")

@@ -24,6 +24,8 @@ public interface Codes {
 	public static final Code EMPLOYEE_ID_MISS			= Code.create("code.employee.id.miss");
 	// 地区不存在
 	public static final Code REGION_NOT_EXIST			= Code.create("code.region.not.exist");
+	// 检查记录不存在
+	public static final Code INSPECT_NOT_EXIST			= Code.create("code.inspect.not.exist");
 	// 单位不存在
 	public static final Code COMPANY_NOT_EXIST			= Code.create("code.company.not.exist");
 	// 用户已经拥有该地区权限

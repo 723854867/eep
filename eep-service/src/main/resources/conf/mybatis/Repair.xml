@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.eep.mybatis.dao.InspectDao" >
+<mapper namespace="org.eep.mybatis.dao.RepairDao" >
 
 	<resultMap id="resourceMap" type="org.eep.common.bean.entity.Resource">
 		<id property="id" column="resource_id"/>
@@ -9,31 +9,34 @@
 		<result property="priority" column="resource_priority"/>
 	</resultMap>
 	
-	<resultMap id="detailMap" type="org.eep.common.bean.model.InspectDetail">
+	<resultMap id="deviceMap" type="org.eep.common.bean.entity.Device">
+		<id property="id" column="device_id"/>
+		<result property="name" column="device_name"/>
+	</resultMap>
+
+	<resultMap id="detailMap" type="org.eep.common.bean.model.RepairDetail">
 		<id property="id" column="id"/>
 		<result property="cid" column="cid"/>
 		<result property="rid" column="rid"/>
-		<result property="time" column="time"/>
 		<result property="cname" column="cname"/>
 		<result property="rname" column="rname"/>
-		<result property="created" column="created"/>
+		<result property="time" column="created"/>
 		<result property="content" column="content"/>
-		<result property="nextTime" column="next_time"/>
+		<collection property="devices" resultMap="deviceMap" />
 		<collection property="resources" resultMap="resourceMap" />
 	</resultMap>
 
-	<select id="list" parameterType="org.eep.common.bean.param.InspectsParam" resultType="org.eep.common.bean.model.InspectInfo">
+	<select id="list" parameterType="org.eep.common.bean.param.RepairsParam" resultType="org.eep.common.bean.model.RepairInfo">
 		SELECT 
 			a.`id`,
 			a.`cid`,
 			a.`rid`,
-			a.`time`,
-			a.`created`,
 			a.`next_time`,
+			a.`created` time,
 			b.`name` cname, 
 			c.`name` rname 
 		FROM 
-			inspect a 
+			repair a 
 		LEFT JOIN 
 			company b 
 		ON 
@@ -69,18 +72,19 @@
 			a.`id`,
 			a.`cid`,
 			a.`rid`,
-			a.`time`,
 			a.`created`,
-			a.`content`,
 			a.`next_time`,
 			b.`name` cname, 
 			c.`name` rname,
+			a.`content`,
 			d.id resource_id, 
 			d.`url`resource_url,
 			d.`name` resource_name,
-			d.`priority` resource_priority
+			d.`priority` resource_priority,
+			e.`device_id`, 
+			f.`name` device_name
 		FROM 
-			inspect a 
+			repair a 
 		LEFT JOIN 
 			company b 
 		ON 
@@ -93,9 +97,17 @@
 			resource d 
 		ON 
 			a.`id`=d.`owner`
-		AND 
-			d.`type`=3
-		WHERE
+		LEFT JOIN 
+			repair_device e 
+		ON 
+			a.`id`=e.repair_id
+		LEFT JOIN 
+			device f 
+		ON 
+			e.`device_id`=f.`id`
+		WHERE 
+			d.`type`=1
+		AND
 			a.`id`=#{id}
 	</select>
 </mapper>

@@ -8,24 +8,24 @@ import org.eep.common.Codes;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
-import org.eep.common.bean.entity.Inspect;
-import org.eep.common.bean.entity.InspectDevice;
+import org.eep.common.bean.entity.Repair;
+import org.eep.common.bean.entity.RepairDevice;
 import org.eep.common.bean.entity.LogExamine;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.AlertType;
 import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.DeviceInfo;
-import org.eep.common.bean.model.InspectDetail;
-import org.eep.common.bean.model.InspectInfo;
+import org.eep.common.bean.model.RepairDetail;
+import org.eep.common.bean.model.RepairInfo;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.DevicesParam;
-import org.eep.common.bean.param.InspectsParam;
+import org.eep.common.bean.param.RepairsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.AlertDao;
 import org.eep.mybatis.dao.DeviceCategoryDao;
 import org.eep.mybatis.dao.DeviceDao;
-import org.eep.mybatis.dao.InspectDao;
-import org.eep.mybatis.dao.InspectDeviceDao;
+import org.eep.mybatis.dao.RepairDao;
+import org.eep.mybatis.dao.RepairDeviceDao;
 import org.eep.mybatis.dao.LogExamineDao;
 import org.eep.mybatis.dao.ResourceDao;
 import org.rubik.bean.core.Assert;
@@ -51,7 +51,7 @@ public class DeviceManager {
 	@javax.annotation.Resource
 	private DeviceDao deviceDao;
 	@javax.annotation.Resource
-	private InspectDao inspectDao;
+	private RepairDao repairDao;
 	@javax.annotation.Resource
 	private ResourceDao resourceDao;
 	@javax.annotation.Resource
@@ -59,7 +59,7 @@ public class DeviceManager {
 	@javax.annotation.Resource
 	private CompanyManager companyManager;
 	@javax.annotation.Resource
-	private InspectDeviceDao inspectDeviceDao;
+	private RepairDeviceDao repairDeviceDao;
 	@javax.annotation.Resource
 	private DeviceCategoryDao deviceCategoryDao;
 	@javax.annotation.Resource
@@ -80,13 +80,13 @@ public class DeviceManager {
 	}
 	
 	@Transactional
-	public void inspectCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
-		Inspect inspect = EntityGenerator.newInspect(cid, rid, content, committer);
-		inspectDao.insert(inspect);
-		List<InspectDevice> list = new ArrayList<InspectDevice>();
-		devices.forEach(deviceId -> list.add(EntityGenerator.newInspectDevice(inspect.getId(), deviceId)));
-		inspectDeviceDao.insertMany(list);
-		resources.forEach(resource -> resource.setOwner(String.valueOf(inspect.getId())));
+	public void repairCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
+		Repair repair = EntityGenerator.newRepair(cid, rid, content, committer);
+		repairDao.insert(repair);
+		List<RepairDevice> list = new ArrayList<RepairDevice>();
+		devices.forEach(deviceId -> list.add(EntityGenerator.newRepairDevice(repair.getId(), deviceId)));
+		repairDeviceDao.insertMany(list);
+		resources.forEach(resource -> resource.setOwner(String.valueOf(repair.getId())));
 		resourceDao.insertMany(resources);
 	}
 	
@@ -139,15 +139,15 @@ public class DeviceManager {
 		return deviceDao.queryList(new Query().and(Criteria.in("id", ids)));
 	}
 	
-	public InspectDetail inspectDetail(long id) {
-		return inspectDao.detail(id);
+	public RepairDetail repairDetail(long id) {
+		return repairDao.detail(id);
 	}
 	
 	public List<DeviceInfo> devices(DevicesParam param) {
 		return deviceDao.list(param);
 	}
 	
-	public List<InspectInfo> inspects(InspectsParam param) {
-		return inspectDao.list(param);
+	public List<RepairInfo> repairs(RepairsParam param) {
+		return repairDao.list(param);
 	}
 }

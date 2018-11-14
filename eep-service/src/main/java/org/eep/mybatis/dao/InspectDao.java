@@ -9,8 +9,8 @@ import org.eep.common.bean.param.InspectsParam;
 import org.rubik.mybatis.extension.Dao;
 
 public interface InspectDao extends Dao<Long, Inspect> {
-
-	InspectDetail detail(long id);
 	
+	InspectDetail detail(long id);
+
 	List<InspectInfo> list(InspectsParam param);
 }

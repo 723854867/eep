@@ -1,16 +1,17 @@
 package org.eep.mybatis;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Alert;
+import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
-import org.eep.common.bean.entity.InspectDevice;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.Law;
 import org.eep.common.bean.entity.LawCategory;
 import org.eep.common.bean.entity.RectifyNotice;
+import org.eep.common.bean.entity.Repair;
+import org.eep.common.bean.entity.RepairDevice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
@@ -97,8 +98,8 @@ public class EntityGenerator {
 		return instance;
 	}
 	
-	public static final Inspect newInspect(String cid, String rid, String content, long committer) {
-		Inspect instance = new Inspect();
+	public static final Repair newRepair(String cid, String rid, String content, long committer) {
+		Repair instance = new Repair();
 		instance.setCid(cid);
 		instance.setRid(rid);
 		instance.setCommitter(committer);
@@ -107,10 +108,10 @@ public class EntityGenerator {
 		return instance;
 	}
 	
-	public static final InspectDevice newInspectDevice(long inspectId, String deviceId) {
-		InspectDevice instance = new InspectDevice();
+	public static final RepairDevice newRepairDevice(long repairId, String deviceId) {
+		RepairDevice instance = new RepairDevice();
 		instance.setDeviceId(deviceId);
-		instance.setInspectId(inspectId);
+		instance.setRepairId(repairId);
 		return instance;
 	}
 	
@@ -223,6 +224,18 @@ public class EntityGenerator {
 		int time = DateUtil.current();
 		instance.setCreated(time);
 		instance.setUpdated(time);
+		return instance;
+	}
+	
+	public static final Inspect newInspect(String cid, String rid, long time, long nextTime, String content, long committer) {
+		Inspect instance = new Inspect();
+		instance.setCid(cid);
+		instance.setRid(rid);
+		instance.setTime(time);
+		instance.setNextTime(nextTime);
+		instance.setCommitter(committer);
+		instance.setCreated(DateUtil.current());
+		instance.setContent(StringUtil.hasText(content) ? content : StringUtil.EMPTY);
 		return instance;
 	}
 }

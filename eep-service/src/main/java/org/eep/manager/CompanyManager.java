@@ -7,6 +7,7 @@ import org.eep.common.Codes;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Employee;
+import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
 import org.eep.common.bean.entity.RectifyNotice;
@@ -18,6 +19,9 @@ import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
+import org.eep.common.bean.model.EmployeeInfo;
+import org.eep.common.bean.model.InspectDetail;
+import org.eep.common.bean.model.InspectInfo;
 import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.RectifyNoticeInfo;
@@ -25,6 +29,8 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
+import org.eep.common.bean.param.EmployeesParam;
+import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorsParam;
@@ -34,6 +40,7 @@ import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.AlertDao;
 import org.eep.mybatis.dao.CompanyDao;
 import org.eep.mybatis.dao.EmployeeDao;
+import org.eep.mybatis.dao.InspectDao;
 import org.eep.mybatis.dao.IntrospectDao;
 import org.eep.mybatis.dao.OperatorCertDao;
 import org.eep.mybatis.dao.OperatorDao;
@@ -63,6 +70,8 @@ public class CompanyManager {
 
 	@javax.annotation.Resource
 	private AlertDao alertDao;
+	@javax.annotation.Resource
+	private InspectDao inspectDao;
 	@javax.annotation.Resource
 	private CompanyDao companyDao;
 	@javax.annotation.Resource
@@ -134,6 +143,17 @@ public class CompanyManager {
 		// 删除这条整改的警告
 		query = new Query().and(Criteria.in("type", AlertType.RECITIFY_NOTICE, AlertType.RECITIFY_NOTICE_EXPIRE), Criteria.eq("rectify_id", param.getId()));
 		alertDao.deleteByQuery(query);
+	}
+	
+	@Transactional
+	public Inspect inspectCreate(String cid, String rid, long time, long nextTime, String content, long committer, List<Resource> resources) {
+		Inspect inspect = EntityGenerator.newInspect(cid, rid, time, nextTime, content, committer);
+		inspectDao.insert(inspect);
+		if (!CollectionUtil.isEmpty(resources)) {
+			resources.forEach(resource -> resource.setOwner(String.valueOf(inspect.getId())));
+			resourceDao.insertMany(resources);
+		}
+		return inspect;
 	}
 	
 	@Transactional
@@ -209,6 +229,10 @@ public class CompanyManager {
 		return introspectDao.selectByKey(id);
 	}
 	
+	public InspectDetail inspectDetail(long id) {
+		return inspectDao.detail(id);
+	}
+	
 	/**
 	 * 获取有效的证书(判断证书有效期用)
 	 */
@@ -220,8 +244,16 @@ public class CompanyManager {
 		return operatorCertDao.queryList(query);
 	}
 	
+	public List<InspectInfo> inspects(InspectsParam param) {
+		return inspectDao.list(param);
+	}
+	
 	public List<CompanyInfo> companies(CompaniesParam param) { 
 		return companyDao.list(param);
+	}
+	
+	public List<EmployeeInfo> employees(EmployeesParam param) {
+		return employeeDao.list(param);
 	}
 	
 	public List<OperatorInfo> operators(OperatorsParam param) { 

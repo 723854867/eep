@@ -7,11 +7,11 @@ import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.model.DeviceInfo;
-import org.eep.common.bean.model.InspectDetail;
-import org.eep.common.bean.model.InspectInfo;
+import org.eep.common.bean.model.RepairDetail;
+import org.eep.common.bean.model.RepairInfo;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.DevicesParam;
-import org.eep.common.bean.param.InspectsParam;
+import org.eep.common.bean.param.RepairsParam;
 import org.eep.manager.DeviceManager;
 import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.param.Param;
@@ -39,8 +39,8 @@ public class DeviceService {
 		deviceManager.categoryDelete(param);
 	}
 	
-	public void inspectCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
-		deviceManager.inspectCreate(cid, rid, content, committer, devices, resources);
+	public void repairCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
+		deviceManager.repairCreate(cid, rid, content, committer, devices, resources);
 	}
 	
 	public void alertCheck() { 
@@ -51,8 +51,8 @@ public class DeviceService {
 		return deviceManager.devices(ids);
 	}
 	
-	public InspectDetail inspectDetail(long id) {
-		return deviceManager.inspectDetail(id);
+	public RepairDetail repairDetail(long id) {
+		return deviceManager.repairDetail(id);
 	}
 	
 	public Pager<DeviceCategory> categories(Param param) {
@@ -66,9 +66,9 @@ public class DeviceService {
 		return PagerUtil.page(deviceManager.devices(param));
 	}
 	
-	public Pager<InspectInfo> inspects(InspectsParam param) { 
+	public Pager<RepairInfo> repairs(RepairsParam param) { 
 		if (null != param.getPage())
 			PageHelper.startPage(param.getPage(), param.getPageSize());
-		return PagerUtil.page(deviceManager.inspects(param));
+		return PagerUtil.page(deviceManager.repairs(param));
 	}
 }

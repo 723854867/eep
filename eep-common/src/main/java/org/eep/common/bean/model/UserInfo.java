@@ -16,11 +16,9 @@ public class UserInfo implements Serializable {
 	private long id;
 	private int created;
 	private int updated;
-	private long region;
 	private String uname;
 	private String avatar;
 	private String nickname;
-	private String regionName;
 	
 	public UserInfo() {}
 	
