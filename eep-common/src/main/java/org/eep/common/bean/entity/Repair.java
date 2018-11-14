@@ -10,16 +10,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class InspectDevice implements Identifiable<Long> {
+public class Repair implements Identifiable<Long> {
 
-	private static final long serialVersionUID = 7519732102518874419L;
-	
+	private static final long serialVersionUID = 6669993732310202627L;
+
 	@Id
 	@GeneratedValue
 	private long id;
-	private long inspectId;
-	private String deviceId;
-
+	private String cid;
+	private String rid;
+	private int created;
+	private String content;
+	private long committer;
+	
 	@Override
 	public Long key() {
 		return this.id;

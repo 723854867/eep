@@ -7,7 +7,9 @@ public enum ResourceType implements IEnum<Integer> {
 	// 设备维保记录图
 	DEVICE_REPAIR(1),
 	// 企业自查自纠文件
-	COMPANY_INTROSPECT(2);
+	COMPANY_INTROSPECT(2),
+	// 检查记录文件
+	COMPANY_INSPECT(3);
 	
 	private int mark;
 	

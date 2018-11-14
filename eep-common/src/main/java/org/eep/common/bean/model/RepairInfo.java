@@ -7,15 +7,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class InspectInfo implements Serializable {
+public class RepairInfo implements Serializable {
 
 	private static final long serialVersionUID = 3887645775018115629L;
 
 	private long id;
-	private long time;
+	private int time;
 	private String cid;
 	private String rid;
-	private int created;
 	private String cname;
 	private String rname;
 	private long nextTime;

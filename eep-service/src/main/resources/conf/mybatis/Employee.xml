@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.EmployeeDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.EmployeesParam" resultType="org.eep.common.bean.model.EmployeeInfo">
+		SELECT 
+			a.`id`,
+			a.`uid`,
+			a.`cid`,
+			a.`state`,
+			b.`region`,
+			b.`name` cname,
+			b.`type` ctype 
+		FROM 
+			employee a 
+		LEFT JOIN 
+			company b 
+		ON 
+			a.`cid`=b.`id`
+		<where>
+			<if test="null != id">
+				a.id=#{id}
+			</if>
+			<if test="null != uid">
+				a.uid=#{uid}
+			</if>
+			<if test="null != type">
+				AND b.type=#{type}
+			</if>
+			<if test="null != cid">
+				AND a.cid=#{cid}
+			</if>
+			<if test="null != name">
+				AND b.`name` LIKE concat(concat('%',#{name}),'%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="alertStatistic" parameterType="org.eep.common.bean.param.AlertStatisticParam" resultType="org.eep.common.bean.model.AlertStatistic">
+		SELECT 
+			warn_level, 
+			SUM(num) num
+		FROM
+			(SELECT 
+				b.num,
+				b.warn_level
+			FROM 
+				company a 
+			LEFT JOIN
+				(SELECT 
+					cid, warn_level, COUNT(*) num 
+				FROM 
+					alert 
+				GROUP BY 
+					cid, warn_level
+				) b 
+			ON 
+				a.`id`=b.`cid`
+			<where>
+				<if test="null != cid">
+					a.id=#{cid}
+				</if>
+				<if test="null != min">
+					<![CDATA[ AND a.region >= #{min} ]]>
+				</if>
+				<if test="null != max">
+					<![CDATA[ AND a.region <= #{max} ]]>
+				</if>
+			</where>
+			) c 
+		GROUP BY warn_level
+	</select>
+</mapper>

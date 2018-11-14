@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.eep.bean.param.InspectCreateParam;
 import org.eep.bean.param.IntrospectUploadParam;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Company;
@@ -14,10 +15,12 @@ import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
+import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
+import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
 import org.eep.common.bean.param.OperatorCertsParam;
@@ -275,5 +278,87 @@ public class CompanyController {
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		param.setCid(company.getId());
 		return companyService.alertStatistic(param);
+	}
+	
+	/**
+	 * 检查记录列表(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("inspects/area")
+	public Object inspectsArea(@RequestBody @Valid InspectsParam param) {
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		return companyService.inspects(param);
+	}
+	
+	/**
+	 * 检查记录(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("inspects/use")
+	public Object inspectsUse(@RequestBody @Valid InspectsParam param) {
+		Visitor visitor = param.requestor();
+		Assert.isTrue(visitor.getCompany().getType() == CompanyType.USE, Code.FORBID);
+		param.setCid(visitor.getCompany().getId());
+		return companyService.inspects(param);
+	}
+	
+	/**
+	 * 检查记录详情(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("inspect/detail")
+	public Object inspectDetailArea(@RequestBody @Valid LidParam param) {
+		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
+		Company company = companyService.company(detail.getCid());
+		regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+		return detail;
+	}
+	
+	/**
+	 * 检查记录详情(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("inspect/detail/use")
+	public Object inspectDetailUse(@RequestBody @Valid LidParam param) {
+		Visitor visitor = param.requestor();
+		Company company = visitor.getCompany();
+		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
+		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
+		Assert.isTrue(detail.getCid().equals(company.getId()));
+		return detail;
+	}
+	
+	/**
+	 * 创建检查记录
+	 */
+	@ResponseBody
+	@RequestMapping("inspect/create")
+	public Object inspectCreate(InspectCreateParam param) { 
+		Company company = Assert.notNull(companyService.company(param.getRid()), Codes.COMPANY_NOT_EXIST);
+		Assert.isTrue(company.getType() == CompanyType.REPAIR, Code.FORBID);
+		company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
+		Visitor visitor = param.requestor();
+		regionService.userRegionVerify(visitor.id(), company.getRegion());
+		int resourceMaximum = rubikConfigService.config(Constants.RESOURCE_MAXIMUM_INSPECT);
+		Assert.isTrue(null == param.getFiles() || param.getFiles().size() <= resourceMaximum, Codes.RESOURCE_MAXIMUM);
+		List<Resource> resources = new ArrayList<Resource>();
+		if(null != param.getFiles()) {
+			String category = "company/inspect";
+			String directory = uploader.resourceDirectory();
+			String url = rubikConfigService.config(Constants.RESOURCE_URL);
+			int priority = 0;
+			for (MultipartFile file : param.getFiles()) {
+				String name = KeyUtil.timebasedId();
+				String suffix = uploader.save(file, directory, category, name);
+				url = url.endsWith("\\/") ? url + suffix : url + "/" + suffix;
+				String path = directory.endsWith("\\/") ? directory + suffix : directory + File.separator + suffix;
+				Resource resource = EntityGenerator.newResource(file.getSize(), url, path, name, ResourceType.COMPANY_INSPECT, null, ++priority);
+				resources.add(resource);
+			}
+		}
+		return companyService.inspectCreate(param.getCid(), param.getRid(), param.getTime(), param.getNextTime(), param.getContent(), visitor.id(), resources);
 	}
 }
