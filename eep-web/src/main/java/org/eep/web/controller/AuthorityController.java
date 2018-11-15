@@ -14,6 +14,7 @@ import org.rubik.soa.authority.api.AuthorityService;
 import org.rubik.soa.authority.bean.param.AuthParam;
 import org.rubik.soa.authority.bean.param.ModularAddParam;
 import org.rubik.soa.authority.bean.param.ModularModifyParam;
+import org.rubik.soa.authority.bean.param.ModuleDeleteParam;
 import org.rubik.soa.authority.bean.param.RoleAddParam;
 import org.rubik.soa.authority.bean.param.RoleModifyParam;
 import org.springframework.stereotype.Controller;
@@ -45,8 +46,8 @@ public class AuthorityController {
 	
 	@ResponseBody
 	@RequestMapping("module/delete")
-	public Object deleteModule(@RequestBody @Valid SidParam param) { 
-		authorityService.deleteModule(Integer.valueOf(param.getId()));
+	public Object deleteModule(@RequestBody @Valid ModuleDeleteParam param) { 
+		authorityService.deleteModule(param.getIds());
 		return Result.ok();
 	}
 	
@@ -58,8 +59,15 @@ public class AuthorityController {
 	
 	@ResponseBody
 	@RequestMapping("module/user/list")
-	public Object cfgModules(@RequestBody @Valid SidParam param) { 
-		return authorityService.cfgModules(Integer.valueOf(param.getId()));
+	public Object cfgUserModules(@RequestBody @Valid Param param) {
+		Long uid = param.getMeta().getRequestor().id();
+		return authorityService.cfgModules(uid.intValue());
+	}
+	
+	@ResponseBody
+	@RequestMapping("module/role/list")
+	public Object cfgRoleModules(@RequestBody @Valid SidParam param) {
+		return authorityService.cfgRoleModules(Integer.valueOf(param.getId()));
 	}
 	
 	@ResponseBody
@@ -85,23 +93,13 @@ public class AuthorityController {
 	@ResponseBody
 	@RequestMapping("role/list")
 	public Object cfgRoles(@RequestBody @Valid Param param) { 
-		return authorityService.cfgRoles();
+		return authorityService.cfgRoles(param.getQuery());
 	}
 	
 	@ResponseBody
 	@RequestMapping("role/user/list")
 	public Object cfgRoles(@RequestBody @Valid SidParam param) { 
 		return authorityService.userRoles(Integer.valueOf(param.getId()));
-	}
-	
-	/*
-	 * 给用户分配模块
-	 */
-	@ResponseBody
-	@RequestMapping("auth/module")
-	public Object modularAuth(@RequestBody @Valid AuthParam param) { 
-		authorityService.modularAuth(param);
-		return Result.ok();
 	}
 	
 	/*
@@ -112,7 +110,7 @@ public class AuthorityController {
 	public Object cfgRoles(@RequestBody @Valid AuthParam param) { 
 		User user = userService.user(param.getSid());
 		Assert.notNull(user,Code.USER_NOT_EIXST);
-		authorityService.roleAuth(param);
+		authorityService.userAuth(param);
 		return Result.ok();
 	}
 
