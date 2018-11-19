@@ -16,8 +16,7 @@ public class CompaniesParam extends Param {
 
 	private static final long serialVersionUID = 7435855527033773205L;
 
-	@Min(1)
-	private Long id;
+	private String id;
 	@Null
 	private Long min;
 	@Null
