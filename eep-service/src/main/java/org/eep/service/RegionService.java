@@ -66,7 +66,6 @@ public class RegionService {
 		List<RegionNode> list = new ArrayList<RegionNode>();
 		if (CollectionUtil.isEmpty(regions))
 			return list;
-		Pair<Long, Long> range = null == own ? null : new RegionIdGenerator(own.getId(), own.getLayer()).range();
 		Collections.sort(regions, (o1, o2) -> o1.getLayer() - o2.getLayer());
 		int minLayer = regions.get(0).getLayer();
 		MultiListMap<Integer, SysRegion> map = new MultiListMap<Integer, SysRegion>();
@@ -80,7 +79,8 @@ public class RegionService {
 			MultiListMap<String, RegionNode> temp = new MultiListMap<String, RegionNode>();
 			for (SysRegion region : l) {
 				RegionNode node = new RegionNode(region);
-				if (null != region) {
+				if (null != own) {
+					Pair<Long, Long> range = new RegionIdGenerator(own.getId(), own.getLayer()).range();
 					if (region.getId() >= range.getKey() && region.getId() <= range.getValue())
 						node.setOwn(true);
 				}
