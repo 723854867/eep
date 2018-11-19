@@ -56,7 +56,7 @@ public class RegionService {
 	}
 
 	public List<RegionNode> regions(Long uid, boolean chain) {
-		List<SysRegion> regions = regionManager.regions();
+		List<SysRegion> regions = regionManager.regions(uid);
 		List<SysRegion> owns = null == uid ? null : regionManager.regions(uid);
 		return _nodes(regions, owns, chain);
 	}
