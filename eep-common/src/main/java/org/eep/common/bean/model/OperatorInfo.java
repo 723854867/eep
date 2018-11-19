@@ -16,6 +16,7 @@ public class OperatorInfo implements Serializable {
 	private Sex sex;
 	private String id;
 	private String cid;
+	private String cname;
 	private String name;
 	private int updated;
 	private String phone;

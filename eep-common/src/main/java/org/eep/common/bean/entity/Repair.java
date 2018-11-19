@@ -19,6 +19,7 @@ public class Repair implements Identifiable<Long> {
 	private long id;
 	private String cid;
 	private String rid;
+	private int nextTime;
 	private int created;
 	private String content;
 	private long committer;

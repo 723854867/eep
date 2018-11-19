@@ -24,16 +24,16 @@ public class InspectCreateParam extends Param {
 	private long time;
 	@NotEmpty
 	private String cid;
-	@NotEmpty
-	private String rid;
-	@Min(1)
-	private long nextTime;
+//	@NotEmpty
+//	private String rid;
+//	@Min(1)
+//	private long nextTime;
 	private String content;
 	private List<MultipartFile> files;
 	
 	@Override
 	public void verify() {
 		super.verify();
-		Assert.isTrue(nextTime > DateUtil.current(), Code.PARAM_ERR);
+//		Assert.isTrue(nextTime > DateUtil.current(), Code.PARAM_ERR);
 	}
 }

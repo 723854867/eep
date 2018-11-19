@@ -5,6 +5,7 @@
 	<select id="list" parameterType="org.eep.common.bean.param.OperatorsParam" resultType="org.eep.common.bean.model.OperatorInfo">
 		SELECT 
 			c.*, 
+			e.name cname,
 			IFNULL(d.expire_time, 0) cer_expire 
 		FROM 
 			operator c 
@@ -15,6 +16,8 @@
                    	FROM operator_cert GROUP BY operator_id)
 			)d 
 		ON c.id=d.operator_id
+		LEFT JOIN 
+			company e ON c.cid = e.id
 		<where>
 			<if test="null != sex">
 				c.sex=#{sex}
@@ -27,6 +30,9 @@
 			</if>
 			<if test="null != name">
 				AND c.`name` LIKE concat(concat('%',#{name}),'%')
+			</if>
+			<if test="null != cname">
+				AND e.`name` LIKE concat(concat('%',#{cname}),'%')
 			</if>
 		</where>
 	</select>

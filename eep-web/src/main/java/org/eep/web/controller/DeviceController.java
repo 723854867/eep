@@ -17,6 +17,7 @@ import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
+import org.eep.common.bean.param.CategoryQueryParam;
 import org.eep.common.bean.param.DevicesParam;
 import org.eep.common.bean.param.RepairsParam;
 import org.eep.mybatis.EntityGenerator;
@@ -157,13 +158,13 @@ public class DeviceController {
 			Resource resource = EntityGenerator.newResource(file.getSize(), url, path, name, ResourceType.DEVICE_REPAIR, null, ++priority);
 			resources.add(resource);
 		}
-		deviceService.repairCreate(param.getCid(), company.getId(), param.getContent(), visitor.id(), param.getDevices(), resources);
+		deviceService.repairCreate(param.getCid(), company.getId(), param.getNextTime(),param.getContent(), visitor.id(), param.getDevices(), resources);
 		return Result.ok();
 	}
 	
 	@ResponseBody
 	@RequestMapping("categories")
-	public Object categories(@RequestBody @Valid Param param) { 
+	public Object categories(@RequestBody @Valid CategoryQueryParam param) { 
 		return deviceService.categories(param);
 	}
 	

@@ -64,8 +64,8 @@ public class CompanyService {
 		companyManager.rectifyNoticeFinish(param);
 	}
 	
-	public Inspect inspectCreate(String cid, String rid, long time, long nextTime, String content, long committer, List<Resource> resources) { 
-		return companyManager.inspectCreate(cid, rid, time, nextTime, content, committer, resources);
+	public Inspect inspectCreate(String cid, long time, String content, long committer, List<Resource> resources) { 
+		return companyManager.inspectCreate(cid, time, content, committer, resources);
 	}
 	
 	public void alertCheck() { 

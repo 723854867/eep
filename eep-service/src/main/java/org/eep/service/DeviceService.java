@@ -10,11 +10,13 @@ import org.eep.common.bean.model.DeviceInfo;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.RepairInfo;
 import org.eep.common.bean.param.CategoryParam;
+import org.eep.common.bean.param.CategoryQueryParam;
 import org.eep.common.bean.param.DevicesParam;
 import org.eep.common.bean.param.RepairsParam;
 import org.eep.manager.DeviceManager;
+import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.Pager;
-import org.rubik.bean.core.param.Param;
+import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.param.SidParam;
 import org.rubik.mybatis.PagerUtil;
 import org.springframework.stereotype.Service;
@@ -39,8 +41,8 @@ public class DeviceService {
 		deviceManager.categoryDelete(param);
 	}
 	
-	public void repairCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
-		deviceManager.repairCreate(cid, rid, content, committer, devices, resources);
+	public void repairCreate(String cid, String rid, int nextTime,String content, long committer, Set<String> devices, List<Resource> resources) { 
+		deviceManager.repairCreate(cid, rid, nextTime,content, committer, devices, resources);
 	}
 	
 	public void alertCheck() { 
@@ -55,10 +57,15 @@ public class DeviceService {
 		return deviceManager.repairDetail(id);
 	}
 	
-	public Pager<DeviceCategory> categories(Param param) {
+	public Pager<DeviceCategory> categories(CategoryQueryParam param) {
 		if (null != param.getPage())
 			PageHelper.startPage(param.getPage(), param.getPageSize());
-		return PagerUtil.page(deviceManager.categories());
+		Query query = new Query();
+		if(null != param.getCode())
+			query.and(Criteria.like("code", param.getCode()));
+		if(null != param.getName())
+			query.and(Criteria.like("name", param.getName()));
+		return PagerUtil.page(deviceManager.categories(query));
 	}
 	
 	public Pager<DeviceInfo> devices(DevicesParam param) {

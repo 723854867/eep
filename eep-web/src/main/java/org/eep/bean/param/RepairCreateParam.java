@@ -28,7 +28,7 @@ public class RepairCreateParam extends Param {
 	// 使用单位编号
 	private String cid;
 	// 下次维保时间
-	private long nextTime;
+	private int nextTime;
 	private String content;
 	private Set<String> devices;
 	@DecimalMax("90")

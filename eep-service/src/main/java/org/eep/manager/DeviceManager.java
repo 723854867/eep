@@ -80,8 +80,8 @@ public class DeviceManager {
 	}
 	
 	@Transactional
-	public void repairCreate(String cid, String rid, String content, long committer, Set<String> devices, List<Resource> resources) { 
-		Repair repair = EntityGenerator.newRepair(cid, rid, content, committer);
+	public void repairCreate(String cid, String rid, int nextTime, String content, long committer, Set<String> devices, List<Resource> resources) { 
+		Repair repair = EntityGenerator.newRepair(cid, rid,nextTime, content, committer);
 		repairDao.insert(repair);
 		List<RepairDevice> list = new ArrayList<RepairDevice>();
 		devices.forEach(deviceId -> list.add(EntityGenerator.newRepairDevice(repair.getId(), deviceId)));
@@ -131,8 +131,8 @@ public class DeviceManager {
 		log.info("设备状态更新结束！");
 	}
 	
-	public List<DeviceCategory> categories() {
-		return deviceCategoryDao.selectList();
+	public List<DeviceCategory> categories(Query query) {
+		return deviceCategoryDao.queryList(query);
 	}
 	
 	public List<Device> devices(Set<String> ids) {

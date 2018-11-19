@@ -77,10 +77,11 @@ public class EntityGenerator {
 		return instance;
 	}
 	
-	public static final Repair newRepair(String cid, String rid, String content, long committer) {
+	public static final Repair newRepair(String cid, String rid, int nextTime, String content, long committer) {
 		Repair instance = new Repair();
 		instance.setCid(cid);
 		instance.setRid(rid);
+		instance.setNextTime(nextTime);
 		instance.setCommitter(committer);
 		instance.setCreated(DateUtil.current());
 		instance.setContent(StringUtil.hasText(content) ? content : StringUtil.EMPTY);
@@ -206,12 +207,10 @@ public class EntityGenerator {
 		return instance;
 	}
 	
-	public static final Inspect newInspect(String cid, String rid, long time, long nextTime, String content, long committer) {
+	public static final Inspect newInspect(String cid, long time, String content, long committer) {
 		Inspect instance = new Inspect();
 		instance.setCid(cid);
-		instance.setRid(rid);
 		instance.setTime(time);
-		instance.setNextTime(nextTime);
 		instance.setCommitter(committer);
 		instance.setCreated(DateUtil.current());
 		instance.setContent(StringUtil.hasText(content) ? content : StringUtil.EMPTY);

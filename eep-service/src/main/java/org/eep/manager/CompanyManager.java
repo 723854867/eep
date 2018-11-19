@@ -126,8 +126,8 @@ public class CompanyManager {
 	}
 	
 	@Transactional
-	public Inspect inspectCreate(String cid, String rid, long time, long nextTime, String content, long committer, List<Resource> resources) {
-		Inspect inspect = EntityGenerator.newInspect(cid, rid, time, nextTime, content, committer);
+	public Inspect inspectCreate(String cid, long time, String content, long committer, List<Resource> resources) {
+		Inspect inspect = EntityGenerator.newInspect(cid, time, content, committer);
 		inspectDao.insert(inspect);
 		if (!CollectionUtil.isEmpty(resources)) {
 			resources.forEach(resource -> resource.setOwner(String.valueOf(inspect.getId())));

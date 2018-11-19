@@ -337,9 +337,7 @@ public class CompanyController {
 	@ResponseBody
 	@RequestMapping("inspect/create")
 	public Object inspectCreate(InspectCreateParam param) { 
-		Company company = Assert.notNull(companyService.company(param.getRid()), Codes.COMPANY_NOT_EXIST);
-		Assert.isTrue(company.getType() == CompanyType.REPAIR, Code.FORBID);
-		company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		int resourceMaximum = rubikConfigService.config(Constants.RESOURCE_MAXIMUM_INSPECT);
@@ -359,6 +357,6 @@ public class CompanyController {
 				resources.add(resource);
 			}
 		}
-		return companyService.inspectCreate(param.getCid(), param.getRid(), param.getTime(), param.getNextTime(), param.getContent(), param.requestor().id(), resources);
+		return companyService.inspectCreate(param.getCid(), param.getTime(), param.getContent(), param.requestor().id(), resources);
 	}
 }
