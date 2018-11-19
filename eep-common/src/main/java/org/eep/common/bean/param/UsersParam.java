@@ -20,9 +20,13 @@ public class UsersParam extends Param {
 	private Long min;
 	@Null
 	private Long max;
+	private String cid;
 	@Min(1)
 	private Long region;
 	private String uname;
+	private String cname;
+	private String mobile;
+	private String cornette;
 	private String nickname;
 	
 	@Override

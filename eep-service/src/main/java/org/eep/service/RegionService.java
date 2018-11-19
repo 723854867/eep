@@ -9,8 +9,10 @@ import javax.annotation.Resource;
 import org.eep.common.Codes;
 import org.eep.common.Consts;
 import org.eep.common.bean.entity.SysRegion;
+import org.eep.common.bean.entity.User;
 import org.eep.common.bean.model.RegionIdGenerator;
 import org.eep.common.bean.model.RegionNode;
+import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.RegionCreateParam;
 import org.eep.common.bean.param.RegionModifyParam;
 import org.eep.manager.RegionManager;
@@ -47,27 +49,24 @@ public class RegionService {
 		return regionManager.create(param);
 	}
 	
-	public void grant(long granter, long grantee, long region) {
+	public void grant(User granter, User grantee, long region) {
 		regionManager.grant(granter, grantee, region);
 	}
 	
-	public void reclaim(long reclaimer, long reclaimee, long region) {
-		regionManager.reclaim(reclaimer, reclaimee, region);
+	public void reclaim(User reclaimer, User reclaimee) {
+		regionManager.reclaim(reclaimer, reclaimee);
 	}
 
-	public List<RegionNode> regions(Long uid, boolean chain) {
-		List<SysRegion> regions = regionManager.regions(uid);
-		List<SysRegion> owns = null == uid ? null : regionManager.regions(uid);
-		return _nodes(regions, owns, chain);
+	public List<RegionNode> regions(Visitor visitor, boolean chain) {
+		List<SysRegion> regions = regionManager.regions();
+		return _nodes(regions, visitor.getRegion(), chain);
 	}
 	
-	private List<RegionNode> _nodes(List<SysRegion> regions, List<SysRegion> owns, boolean chain) {
+	private List<RegionNode> _nodes(List<SysRegion> regions, SysRegion own, boolean chain) {
 		List<RegionNode> list = new ArrayList<RegionNode>();
 		if (CollectionUtil.isEmpty(regions))
 			return list;
-		List<Pair<Long, Long>> ranges = new ArrayList<Pair<Long, Long>>();
-		if (!CollectionUtil.isEmpty(owns)) 
-			owns.forEach(area -> ranges.add(new RegionIdGenerator(area.getId(), area.getLayer()).range()));
+		Pair<Long, Long> range = null == own ? null : new RegionIdGenerator(own.getId(), own.getLayer()).range();
 		Collections.sort(regions, (o1, o2) -> o1.getLayer() - o2.getLayer());
 		int minLayer = regions.get(0).getLayer();
 		MultiListMap<Integer, SysRegion> map = new MultiListMap<Integer, SysRegion>();
@@ -81,7 +80,7 @@ public class RegionService {
 			MultiListMap<String, RegionNode> temp = new MultiListMap<String, RegionNode>();
 			for (SysRegion region : l) {
 				RegionNode node = new RegionNode(region);
-				for (Pair<Long, Long> range : ranges) {
+				if (null != region) {
 					if (region.getId() >= range.getKey() && region.getId() <= range.getValue())
 						node.setOwn(true);
 				}
@@ -108,23 +107,17 @@ public class RegionService {
 		return list;
 	}
 	
-	public SysRegion userRegionVerify(long uid, long region) {
+	public SysRegion userRegionVerify(Visitor visitor, long region) {
 		SysRegion sysRegion = Assert.notNull(regionManager.region(region), Codes.REGION_NOT_EXIST);
 		long root = rubikConfigService.config(Consts.ROOT_UID);
-		if (uid != root) {
-			List<SysRegion> areas = regionManager.regions(uid);
-			for (SysRegion temp : areas) {
-				RegionIdGenerator geo = new RegionIdGenerator(temp.getId(), temp.getLayer());
-				Pair<Long, Long> range = geo.range();
-				if (range.getKey() <= region && range.getValue() >= region)
-					return sysRegion;
-			}
+		if (visitor.id() != root) {
+			Assert.notNull(visitor.getRegion(), Codes.REGION_UNPERMISSION);
+			RegionIdGenerator geo = new RegionIdGenerator(visitor.getRegion().getId(), visitor.getRegion().getLayer());
+			Pair<Long, Long> range = geo.range();
+			if (range.getKey() <= region && range.getValue() >= region)
+				return sysRegion;
 			throw AssertException.error(Codes.REGION_UNPERMISSION);
 		}
 		return sysRegion;
-	}
-	
-	public void userRegionInherit(long inheriter, long inheritee) {
-		regionManager.userRegionInherit(inheriter, inheritee);
 	}
 }

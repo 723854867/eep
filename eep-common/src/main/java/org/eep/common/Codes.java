@@ -20,8 +20,8 @@ public interface Codes {
 	public static final Code RESOURCE_MAXIMUM			= Code.create("code.resource.maximum");
 	// 设备不存在
 	public static final Code DEVICE_NOT_EXIST			= Code.create("code.device.not.exist");
-	// 请选择企业
-	public static final Code EMPLOYEE_ID_MISS			= Code.create("code.employee.id.miss");
+	// 不是企业员工
+	public static final Code NOT_AN_EMPLOYEE			= Code.create("code.not.an.employee");
 	// 地区不存在
 	public static final Code REGION_NOT_EXIST			= Code.create("code.region.not.exist");
 	// 检查记录不存在

@@ -6,7 +6,6 @@ import java.util.List;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.Company;
-import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
@@ -19,17 +18,14 @@ import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
-import org.eep.common.bean.model.EmployeeInfo;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.InspectInfo;
 import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.RectifyNoticeInfo;
-import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
-import org.eep.common.bean.param.EmployeesParam;
 import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
@@ -39,7 +35,6 @@ import org.eep.common.bean.param.RectifyNoticesParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.AlertDao;
 import org.eep.mybatis.dao.CompanyDao;
-import org.eep.mybatis.dao.EmployeeDao;
 import org.eep.mybatis.dao.InspectDao;
 import org.eep.mybatis.dao.IntrospectDao;
 import org.eep.mybatis.dao.OperatorCertDao;
@@ -49,7 +44,6 @@ import org.eep.mybatis.dao.ResourceDao;
 import org.eep.service.RegionService;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
-import org.rubik.bean.core.exception.AssertException;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.MultiListMap;
@@ -58,7 +52,6 @@ import org.rubik.bean.core.param.LidParam;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.CollectionUtil;
 import org.rubik.util.common.DateUtil;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,8 +70,6 @@ public class CompanyManager {
 	@javax.annotation.Resource
 	private ResourceDao resourceDao;
 	@javax.annotation.Resource
-	private EmployeeDao employeeDao;
-	@javax.annotation.Resource
 	private UserManager userManager;
 	@javax.annotation.Resource
 	private OperatorDao operatorDao;
@@ -93,25 +84,14 @@ public class CompanyManager {
 	@javax.annotation.Resource
 	private RubikConfigService rubikConfigService;
 	
-	public void visitorSetup(Visitor visitor, long employeeId) {
-		Employee employee = Assert.notNull(employeeDao.selectByKey(employeeId), Codes.EMPLOYEE_NOT_EXIST);
-		Assert.isTrue(employee.getUid() == visitor.id(), Code.FORBID);
-		visitor.setEmployee(employee);
-		visitor.setCompany(companyDao.selectByKey(employee.getCid()));
-	}
-	
 	@Transactional
-	public Employee employeeCreate(EmployeeCreateParam param) {
+	public void employeeCreate(EmployeeCreateParam param) {
 		User user = Assert.notNull(userManager.user(param.getUid()), Code.USER_NOT_EIXST);
 		Company company = Assert.notNull(companyDao.selectByKey(param.getCid()), Codes.COMPANY_NOT_EXIST);
-		regionService.userRegionVerify(param.requestor().id(), company.getRegion());
-		Employee employee = EntityGenerator.newEmployee(user, company);
-		try {
-			employeeDao.insert(employee);
-		} catch (DuplicateKeyException e) {
-			throw AssertException.error(Codes.EMPLOYEE_DUPLICATED);
-		}
-		return employee;
+		regionService.userRegionVerify(param.requestor(), company.getRegion());
+		user.setCid(company.getId());
+		user.setUpdated(DateUtil.current());
+		userManager.update(user);
 	}
 	
 	public long introspectCreate(IntrospectCreateParam param) { 
@@ -250,10 +230,6 @@ public class CompanyManager {
 	
 	public List<CompanyInfo> companies(CompaniesParam param) { 
 		return companyDao.list(param);
-	}
-	
-	public List<EmployeeInfo> employees(EmployeesParam param) {
-		return employeeDao.list(param);
 	}
 	
 	public List<OperatorInfo> operators(OperatorsParam param) { 

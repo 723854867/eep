@@ -45,9 +45,6 @@ public class GatewayHook implements org.rubik.web.GatewayHook {
 			meta.setRequestor(visitor);
 			if (null != api && api.isLogin())
 				Assert.notNull(visitor, Code.UNLOGIN);
-			Long employeeId = meta.getLongHeader("employeeid");
-			if (null != employeeId)
-				companyService.visitorSetup(visitor, employeeId);
 		} finally {
 			if (null != api && api.isLock()) 
 				userService.releaseLock(visitor);

@@ -5,32 +5,49 @@
 	<select id="list" parameterType="org.eep.common.bean.param.UsersParam" resultType="org.eep.common.bean.model.UserInfo">
 		SELECT 
 			a.id,
+			a.cid,
 			a.uname,
+			a.mobile,
 			a.avatar,
-			b.region,
+			a.region,
 			a.created,
 			a.updated,
 			a.nickname,
+			a.cornette,
+			d.type ctype,
+			d.name cname,
 			c.name regionName
 		FROM 
 			user a
-		LEFT JOIN 
-			user_region b
-		ON 
-			a.id=b.uid
 		LEFT JOIN
 			sys_region c
 		ON
-			b.region=c.id
+			a.region=c.id
+		LEFT JOIN
+			company d
+		ON
+			a.cid=d.id
 		<where>
 			<if test="null != id">
 				a.id=#{id}
 			</if>
+			<if test="null != cid">
+				AND a.cid=#{cid}
+			</if>
+			<if test="null != cname">
+				AND d.`name` LIKE concat(concat('%',#{cname}),'%')
+			</if>
+			<if test="null != mobile">
+				AND a.mobile=#{mobile}
+			</if>
+			<if test="null != cornette">
+				AND a.cornette=#{cornette}
+			</if>
 			<if test="null != min">
-				<![CDATA[ AND b.region >= #{min} ]]>
+				<![CDATA[ AND a.region >= #{min} ]]>
 			</if>
 			<if test="null != max">
-				<![CDATA[ AND b.region <= #{max} ]]>
+				<![CDATA[ AND a.region <= #{max} ]]>
 			</if>
 			<if test="null != uname">
 				AND a.`uname` LIKE concat(concat('%',#{uname}),'%')

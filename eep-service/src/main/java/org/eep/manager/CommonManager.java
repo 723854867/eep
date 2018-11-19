@@ -11,6 +11,7 @@ import org.eep.common.bean.param.LawCategoryCreateParam;
 import org.eep.common.bean.param.LawCategoryModifyParam;
 import org.eep.common.bean.param.LawCreateParam;
 import org.eep.common.bean.param.LawModifyParam;
+import org.eep.common.bean.param.LawsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.LawCategoryDao;
 import org.eep.mybatis.dao.LawDao;
@@ -83,8 +84,8 @@ public class CommonManager {
 		lawDao.deleteByKey(param.getId());
 	}
 	
-	public List<Law> laws(Query query) {
-		return lawDao.queryList(query);
+	public List<Law> laws(LawsParam param) {
+		return lawDao.list(param);
 	}
 	
 	public List<LawCategory> lawCategories(Query query) {

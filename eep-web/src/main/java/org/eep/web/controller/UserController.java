@@ -3,14 +3,12 @@ package org.eep.web.controller;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.eep.bean.model.UserPrivilleges;
 import org.eep.bean.param.UserInfoParam;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.User;
-import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.model.UserInfo;
+import org.eep.common.bean.model.UserPrivilleges;
 import org.eep.common.bean.model.Visitor;
-import org.eep.common.bean.param.EmployeesParam;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
@@ -43,15 +41,8 @@ public class UserController {
 	@RequestMapping("privilleges")
 	public Object info(@RequestBody @Valid UserInfoParam param) {
 		Visitor visitor = param.requestor();
-		User user = visitor.getUser();
-		UserPrivilleges privilleges = new UserPrivilleges(user);
-		privilleges.setRegions(regionService.regions(user.getId(), param.isRegionChain()));
-		EmployeesParam ep = new EmployeesParam();
-		ep.setUid(user.getId());
-		ep.setType(CompanyType.USE);
-		privilleges.setUses(companyService.emploees(ep).getList());
-		ep.setType(CompanyType.REPAIR);
-		privilleges.setRepairs(companyService.emploees(ep).getList());
+		UserPrivilleges privilleges = new UserPrivilleges(visitor);
+		privilleges.setRegions(regionService.regions(visitor, param.isRegionChain()));
 		return privilleges;
 	}
 
@@ -80,7 +71,7 @@ public class UserController {
 	@RequestMapping("list/area")
 	public Object listArea(@RequestBody @Valid UsersParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return userService.list(param);
 	}

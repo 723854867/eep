@@ -3,7 +3,6 @@ package org.eep.service;
 import java.util.List;
 
 import org.eep.common.bean.entity.Company;
-import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
@@ -11,17 +10,14 @@ import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
-import org.eep.common.bean.model.EmployeeInfo;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.InspectInfo;
 import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.RectifyNoticeInfo;
-import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
-import org.eep.common.bean.param.EmployeesParam;
 import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.IntrospectParam;
@@ -48,12 +44,8 @@ public class CompanyService {
 	@javax.annotation.Resource
 	private RubikConfigService rubikConfigService;
 	
-	public void visitorSetup(Visitor visitor, long employeeId) {
-		companyManager.visitorSetup(visitor, employeeId);
-	}
-	
-	public Employee employeeCreate(EmployeeCreateParam param) { 
-		return companyManager.employeeCreate(param);
+	public void employeeCreate(EmployeeCreateParam param) { 
+		companyManager.employeeCreate(param);
 	}
 	
 	public long introspectCreate(IntrospectCreateParam param) { 
@@ -90,12 +82,6 @@ public class CompanyService {
 	
 	public InspectDetail inspectDetail(long id) {
 		return companyManager.inspectDetail(id);
-	}
-	
-	public Pager<EmployeeInfo> emploees(EmployeesParam param) { 
-		if (null != param.getPage())
-			PageHelper.startPage(param.getPage(), param.getPageSize());
-		return PagerUtil.page(companyManager.employees(param));
 	}
 	
 	public Pager<InspectInfo> inspects(InspectsParam param) {

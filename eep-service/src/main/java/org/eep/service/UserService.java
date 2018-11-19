@@ -3,6 +3,8 @@ package org.eep.service;
 import javax.annotation.Resource;
 
 import org.eep.common.bean.entity.Api;
+import org.eep.common.bean.entity.Company;
+import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.model.LoginInfo;
 import org.eep.common.bean.model.UserInfo;
@@ -11,10 +13,13 @@ import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
 import org.eep.common.bean.param.UsersParam;
+import org.eep.manager.CompanyManager;
+import org.eep.manager.RegionManager;
 import org.eep.manager.UserManager;
 import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.param.Param;
 import org.rubik.mybatis.PagerUtil;
+import org.rubik.util.common.StringUtil;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
@@ -24,6 +29,10 @@ public class UserService {
 
 	@Resource
 	private UserManager userManager;
+	@Resource
+	private RegionManager regionManager;
+	@Resource
+	private CompanyManager companyManager;
 	
 	public User user(long uid) {
 		return userManager.user(uid);
@@ -50,10 +59,20 @@ public class UserService {
 	}
 	
 	public Visitor visitor(Api api, String token) {
+		Visitor visitor = null;
 		if (null == api || !api.isLock()) 
-			return userManager.getVisitorByToken(api, token);
+			visitor = userManager.getVisitorByToken(api, token);
 		else 
-			return userManager.lockVisitorByToken(api, token);
+			visitor = userManager.lockVisitorByToken(api, token);
+		if (StringUtil.hasText(visitor.getUser().getCid())) {
+			Company company = companyManager.company(visitor.getUser().getCid());
+			visitor.setCompany(company);
+		}
+		if (0 != visitor.getUser().getRegion()) {
+			SysRegion region = regionManager.region(visitor.getUser().getRegion());
+			visitor.setRegion(region);
+		}
+		return visitor;
 	}
 	
 	public Pager<UserInfo> list(UsersParam param) {

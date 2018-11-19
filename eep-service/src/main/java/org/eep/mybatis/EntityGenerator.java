@@ -2,9 +2,7 @@ package org.eep.mybatis;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.bean.entity.Alert;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.DeviceCategory;
-import org.eep.common.bean.entity.Employee;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.Law;
@@ -15,10 +13,8 @@ import org.eep.common.bean.entity.RepairDevice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
-import org.eep.common.bean.entity.UserRegion;
 import org.eep.common.bean.entity.UserToken;
 import org.eep.common.bean.enums.AlertType;
-import org.eep.common.bean.enums.EmployeeState;
 import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.enums.WarnLevel;
@@ -42,9 +38,11 @@ public class EntityGenerator {
 		User instance = new User();
 		instance.setUname(param.getUname());
 		instance.setAvatar(StringUtil.EMPTY);
+		instance.setMobile(param.getMobile());
 		instance.setNickname(param.getNickname());
 		instance.setSalt(KeyUtil.randomCode(6, false));
 		instance.setPwd(DigestUtils.md5Hex(param.getPassword() + "_" + instance.getSalt()));
+		instance.setCornette(StringUtil.hasText(param.getCornette()) ? param.getCornette() : StringUtil.EMPTY);
 		int time = DateUtil.current();
 		instance.setCreated(time);
 		instance.setUpdated(time);
@@ -73,25 +71,6 @@ public class EntityGenerator {
 		instance.setOpen(null == parent ? false : parent.isOpen());
 		instance.setLayer(null == parent ? 1 : parent.getLayer() + 1);
 		instance.setTrunk(null == parent ? KeyUtil.timebasedId() : parent.getTrunk());
-		int time = DateUtil.current();
-		instance.setCreated(time);
-		instance.setUpdated(time);
-		return instance;
-	}
-	
-	public static final UserRegion newUserRegion(long uid, SysRegion region) {
-		UserRegion instance = new UserRegion();
-		instance.setUid(uid);
-		instance.setRegion(region.getId());
-		instance.setCreated(DateUtil.current());
-		return instance;
-	}
-	
-	public static final Employee newEmployee(User user, Company company) {
-		Employee instance = new Employee();
-		instance.setUid(user.getId());
-		instance.setCid(company.getId());
-		instance.setState(EmployeeState.NORMAL);
 		int time = DateUtil.current();
 		instance.setCreated(time);
 		instance.setUpdated(time);

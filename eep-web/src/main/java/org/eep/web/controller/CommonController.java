@@ -72,7 +72,7 @@ public class CommonController {
 	@ResponseBody
 	@RequestMapping("law/list")
 	public Object laws(@RequestBody @Valid LawsParam param) { 
-		return commonService.laws(param.getQuery());
+		return commonService.laws(param);
 	}
 	
 	@ResponseBody

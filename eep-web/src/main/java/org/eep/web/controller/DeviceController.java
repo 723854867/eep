@@ -66,7 +66,7 @@ public class DeviceController {
 	public Object devicesCompany(@RequestBody @Valid DevicesParam param) {
 		Assert.hasText(param.getCid(), Code.PARAM_ERR, "cid miss");
 		Visitor visitor = param.requestor();
-		Assert.isTrue(visitor.getEmployee().getCid().equals(param.getCid()), Code.FORBID);
+		Assert.isTrue(visitor.getUser().getCid().equals(param.getCid()), Code.FORBID);
 		return deviceService.devices(param);
 	}
 
@@ -77,7 +77,7 @@ public class DeviceController {
 	@RequestMapping("repairs/area")
 	public Object repairsArea(@RequestBody @Valid RepairsParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return deviceService.repairs(param);
 	}
@@ -103,7 +103,7 @@ public class DeviceController {
 		RepairDetail detail = deviceService.repairDetail(param.getId());
 		if (null != detail) {		// 检测区域权限
 			Company company = companyService.company(detail.getCid());
-			regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+			regionService.userRegionVerify(param.requestor(), company.getRegion());
 		}
 		return detail;
 	}

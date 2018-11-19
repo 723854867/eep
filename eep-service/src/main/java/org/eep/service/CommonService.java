@@ -8,6 +8,7 @@ import org.eep.common.bean.param.LawCategoryCreateParam;
 import org.eep.common.bean.param.LawCategoryModifyParam;
 import org.eep.common.bean.param.LawCreateParam;
 import org.eep.common.bean.param.LawModifyParam;
+import org.eep.common.bean.param.LawsParam;
 import org.eep.manager.CommonManager;
 import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.model.Query;
@@ -47,10 +48,10 @@ public class CommonService {
 		commonManager.lawDelete(param);
 	}
 
-	public Pager<Law> laws(Query query) { 
-		if (null != query.getPage())
-			PageHelper.startPage(query.getPage(), query.getPageSize());
-		return PagerUtil.page(commonManager.laws(query));
+	public Pager<Law> laws(LawsParam param) { 
+		if (null != param.getPage())
+			PageHelper.startPage(param.getPage(), param.getPageSize());
+		return PagerUtil.page(commonManager.laws(param));
 	}
 	
 	public Pager<LawCategory> lawCategories(Query query) { 

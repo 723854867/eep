@@ -2,7 +2,7 @@ package org.eep.common.bean.model;
 
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Company;
-import org.eep.common.bean.entity.Employee;
+import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.entity.UserToken;
 import org.rubik.bean.core.Assert;
@@ -14,7 +14,7 @@ public class Visitor implements Requestor {
 	private String lockId;
 	private Company company;
 	private UserToken token;
-	private Employee employee;
+	private SysRegion region;
 	
 	public Visitor(User user, UserToken token) {
 		this.user = user;
@@ -49,19 +49,23 @@ public class Visitor implements Requestor {
 		return token;
 	}
 	
+	public SysRegion getRegion() {
+		return region;
+	}
+	
+	public Company company() {
+		return this.company;
+	}
+	
 	public Company getCompany() {
-		return Assert.notNull(company, Codes.EMPLOYEE_ID_MISS);
+		return Assert.notNull(company, Codes.NOT_AN_EMPLOYEE);
 	}
 	
 	public void setCompany(Company company) {
 		this.company = company;
 	}
 	
-	public Employee getEmployee() {
-		return Assert.notNull(employee, Codes.EMPLOYEE_ID_MISS);
-	}
-	
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setRegion(SysRegion region) {
+		this.region = region;
 	}
 }

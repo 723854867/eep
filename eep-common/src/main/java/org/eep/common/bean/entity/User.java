@@ -17,12 +17,16 @@ public class User implements Identifiable<Long> {
 	@Id
 	@GeneratedValue
 	private long id;
+	private String cid;
 	private String pwd;
+	private Long region;
 	private int created;
 	private int updated;
 	private String salt;
 	private String uname;
 	private String avatar;
+	private String mobile;
+	private String cornette;
 	private String nickname;
 	
 	@Override

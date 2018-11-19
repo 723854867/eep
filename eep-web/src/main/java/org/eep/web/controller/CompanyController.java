@@ -89,7 +89,7 @@ public class CompanyController {
 	@RequestMapping("list/use/area")
 	public Object usesArea(@RequestBody @Valid CompaniesParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		SysRegion region = regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		SysRegion region = regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, region);
 		param.setType(CompanyType.USE);
 		return companyService.companies(param);
@@ -102,7 +102,7 @@ public class CompanyController {
 	@RequestMapping("list/repair/area")
 	public Object repairsArea(@RequestBody @Valid CompaniesParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		SysRegion region = regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		SysRegion region = regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, region);
 		param.setType(CompanyType.REPAIR);
 		return companyService.companies(param);
@@ -114,7 +114,8 @@ public class CompanyController {
 	@ResponseBody
 	@RequestMapping("employee/create")
 	public Object employeeCreate(@RequestBody @Valid EmployeeCreateParam param) { 
-		return companyService.employeeCreate(param);
+		companyService.employeeCreate(param);
+		return Result.ok();
 	}
 	
 	/**
@@ -215,7 +216,7 @@ public class CompanyController {
 	@RequestMapping("rectify/notice/list/area")
 	public Object rectifyNoticesArea(@RequestBody @Valid RectifyNoticesParam param) { 
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return companyService.rectifyNotices(param);
 	}
@@ -241,7 +242,7 @@ public class CompanyController {
 	public Object rectifyNoticeCreate(@RequestBody @Valid RectifyNoticeCreateParam param) { 
 		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
-		regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		return companyService.rectifyNoticeCreate(param);
 	}
 	
@@ -262,7 +263,7 @@ public class CompanyController {
 	@RequestMapping("alert/statistic/area")
 	public Object alertStatisticArea(@RequestBody @Valid AlertStatisticParam param) { 
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return companyService.alertStatistic(param);
 	}
@@ -287,7 +288,7 @@ public class CompanyController {
 	@RequestMapping("inspects/area")
 	public Object inspectsArea(@RequestBody @Valid InspectsParam param) {
 		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor().id(), param.getRegion());
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return companyService.inspects(param);
 	}
@@ -312,7 +313,7 @@ public class CompanyController {
 	public Object inspectDetailArea(@RequestBody @Valid LidParam param) {
 		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
 		Company company = companyService.company(detail.getCid());
-		regionService.userRegionVerify(param.requestor().id(), company.getRegion());
+		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		return detail;
 	}
 	
@@ -340,25 +341,24 @@ public class CompanyController {
 		Assert.isTrue(company.getType() == CompanyType.REPAIR, Code.FORBID);
 		company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
-		Visitor visitor = param.requestor();
-		regionService.userRegionVerify(visitor.id(), company.getRegion());
+		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		int resourceMaximum = rubikConfigService.config(Constants.RESOURCE_MAXIMUM_INSPECT);
 		Assert.isTrue(null == param.getFiles() || param.getFiles().size() <= resourceMaximum, Codes.RESOURCE_MAXIMUM);
 		List<Resource> resources = new ArrayList<Resource>();
 		if(null != param.getFiles()) {
 			String category = "company/inspect";
 			String directory = uploader.resourceDirectory();
-			String url = rubikConfigService.config(Constants.RESOURCE_URL);
+			String resourceUrl = rubikConfigService.config(Constants.RESOURCE_URL);
 			int priority = 0;
 			for (MultipartFile file : param.getFiles()) {
 				String name = KeyUtil.timebasedId();
 				String suffix = uploader.save(file, directory, category, name);
-				url = url.endsWith("\\/") ? url + suffix : url + "/" + suffix;
+				String url = resourceUrl.endsWith("\\/") ? resourceUrl + suffix : resourceUrl + "/" + suffix;
 				String path = directory.endsWith("\\/") ? directory + suffix : directory + File.separator + suffix;
 				Resource resource = EntityGenerator.newResource(file.getSize(), url, path, name, ResourceType.COMPANY_INSPECT, null, ++priority);
 				resources.add(resource);
 			}
 		}
-		return companyService.inspectCreate(param.getCid(), param.getRid(), param.getTime(), param.getNextTime(), param.getContent(), visitor.id(), resources);
+		return companyService.inspectCreate(param.getCid(), param.getRid(), param.getTime(), param.getNextTime(), param.getContent(), param.requestor().id(), resources);
 	}
 }

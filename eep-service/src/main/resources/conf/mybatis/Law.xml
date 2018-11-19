@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.LawDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.LawsParam" resultType="org.eep.common.bean.entity.Law">
+		SELECT 
+			*
+		FROM 
+			law
+		<where>
+			<if test="null != categoryId">
+				category_id=#{categoryId}
+			</if>
+			<if test="null != content">
+				AND (`title` LIKE concat(concat('%',#{content}),'%') OR `content` LIKE concat(concat('%',#{content}),'%') ) 
+			</if>
+		</where>
+	</select>
+</mapper>

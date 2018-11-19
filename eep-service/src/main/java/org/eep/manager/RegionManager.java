@@ -12,13 +12,12 @@ import javax.annotation.Resource;
 import org.eep.common.Codes;
 import org.eep.common.Consts;
 import org.eep.common.bean.entity.SysRegion;
-import org.eep.common.bean.entity.UserRegion;
+import org.eep.common.bean.entity.User;
 import org.eep.common.bean.model.RegionIdGenerator;
 import org.eep.common.bean.param.RegionCreateParam;
 import org.eep.common.bean.param.RegionModifyParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.SysRegionDao;
-import org.eep.mybatis.dao.UserRegionDao;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.exception.AssertException;
 import org.rubik.bean.core.model.Criteria;
@@ -37,9 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegionManager {
 	
 	@Resource
-	private SysRegionDao sysRegionDao;
+	private UserManager userManager;
 	@Resource
-	private UserRegionDao userRegionDao;
+	private SysRegionDao sysRegionDao;
 	@Resource
 	private RubikConfigService rubikConfigService;
 
@@ -161,86 +160,47 @@ public class RegionManager {
 		}
 		Assert.isTrue(deleted.size() == (delt / 2));
 		sysRegionDao.deleteByKeys(deleted);
-		userRegionDao.deleteByQuery(new Query().and(Criteria.in("region", deleted)));
+		RegionIdGenerator id = new RegionIdGenerator(region.getId(), region.getLayer());
+		Pair<Long, Long> range = id.range();
+		userManager.deleteRegion(range.getKey(), range.getValue());
 		if (!CollectionUtil.isEmpty(regions))
 			sysRegionDao.replaceMap(regions);
 	}
 	
 	@Transactional
-	public void userRegionInherit(long inheriter, long inheritee) { 
-		userRegionDao.deleteByQuery(new Query().and(Criteria.eq("uid", inheritee)));
-		Set<UserRegion> set = new HashSet<UserRegion>();
-		regions(inheriter).forEach(region -> set.add(EntityGenerator.newUserRegion(inheritee, region)));
-		if (!CollectionUtil.isEmpty(set))
-			userRegionDao.insertMany(set);
-	}
-	
-	@Transactional
-	public void grant(long granter, long grantee, long region) {
+	public void grant(User granter, User grantee, long region) {
 		Query query = new Query().and(Criteria.eq("id", region)).forUpdate();
-		SysRegion sysRegion = Assert.notNull(sysRegionDao.queryUnique(query), Codes.REGION_NOT_EXIST);
+		Assert.notNull(sysRegionDao.queryUnique(query), Codes.REGION_NOT_EXIST);
 		long root = rubikConfigService.config(Consts.ROOT_UID);
-		Set<Long> granterRegions = null;
-		Set<Long> set = new HashSet<Long>();
-		if (granter != root) {
-			granterRegions = userRegionDao.lockUserRegions(granter);
-			Assert.isTrue(!CollectionUtil.isEmpty(granterRegions), Codes.REGION_UNPERMISSION);
-			set.addAll(granterRegions);
+		if (granter.getId() != root) {				// 非 root用户需要判断区域权限
+			SysRegion granterRegion = 0 == granter.getRegion() ? null : sysRegionDao.selectByKey(granter.getRegion());
+			Assert.notNull(granterRegion, Codes.REGION_UNPERMISSION);
+			RegionIdGenerator id = new RegionIdGenerator(granterRegion.getId(), granterRegion.getLayer());
+			Pair<Long, Long> range = id.range();
+			Assert.isTrue(range.getKey() <= region && range.getValue() >= region, Codes.REGION_UNPERMISSION);
 		}
-		Set<Long> acceptorAreas = userRegionDao.lockUserRegions(grantee);
-		set.addAll(acceptorAreas);
-		Map<Long, SysRegion> areas = CollectionUtil.isEmpty(set) ? null : sysRegionDao.queryMap(new Query().and(Criteria.in("id", set)).forUpdate());
-		if (granter != root) {				// 非 root用户需要判断区域权限
-			boolean hit = false;
-			for (long temp : granterRegions) {
-				SysRegion tempRegion = areas.get(temp);
-				RegionIdGenerator id = new RegionIdGenerator(tempRegion.getId(), tempRegion.getLayer());
-				Pair<Long, Long> range = id.range();
-				if (range.getKey() <= region && range.getValue() >= region) {
-					hit = true;
-					break;
-				}
-			}
-			Assert.isTrue(hit, Codes.REGION_UNPERMISSION);
-		}
-		if (!CollectionUtil.isEmpty(acceptorAreas)) {
-			for (long temp : acceptorAreas) {
-				SysRegion tempRegion = areas.get(temp);
-				RegionIdGenerator id = new RegionIdGenerator(tempRegion.getId(), tempRegion.getLayer());
-				Pair<Long, Long> range = id.range();
-				Assert.isTrue(range.getKey() > region || range.getValue() < region, Codes.USER_REGION_EXIST);
-			}
-		}
-		// 先删除当前地区的所有子行政区划的授权，再赋予该地区，避免重叠
-		Pair<Long, Long> range = new RegionIdGenerator(sysRegion.getId(), sysRegion.getLayer()).range();
-		userRegionDao.deleteByQuery(new Query().and(Criteria.eq("uid", grantee), Criteria.lte("region", range.getValue()), Criteria.gte("region", range.getKey())));
-		userRegionDao.insert(EntityGenerator.newUserRegion(grantee, sysRegion));
+		grantee.setRegion(region);
+		grantee.setUpdated(DateUtil.current());
+		userManager.update(grantee);
 	}
 	
 	/**
 	 * 收回行政区划只能收回子级行政区划
 	 */
 	@Transactional
-	public void reclaim(long reclaimer, long reclaimee, long region) { 
+	public void reclaim(User reclaimer, User reclaimee) { 
+		if (reclaimee.getRegion() == 0)
+			return;
 		long root = rubikConfigService.config(Consts.ROOT_UID);
-		if (reclaimer != root) {
-			Set<Long> set = userRegionDao.lockUserRegions(reclaimer);
-			Assert.isTrue(!CollectionUtil.isEmpty(set), Codes.REGION_UNPERMISSION);
-			Query query = new Query().and(Criteria.in("id", set)).forUpdate();
-			Map<Long, SysRegion> regions = sysRegionDao.queryMap(query);
-			boolean hit = false;
-			for (SysRegion temp : regions.values()) {
-				RegionIdGenerator id = new RegionIdGenerator(temp.getId(), temp.getLayer());
-				Pair<Long, Long> range = id.range();
-				if (range.getKey() <= region && range.getValue() >= region) {
-					hit = true;
-					break;
-				}
-			}
-			Assert.isTrue(hit, Codes.REGION_UNPERMISSION);
-			set = userRegionDao.lockUserRegions(reclaimee);
+		if (reclaimer.getId() != root) {
+			SysRegion reclaimerRegion = sysRegionDao.selectByKey(reclaimer.getRegion());
+			RegionIdGenerator id = new RegionIdGenerator(reclaimerRegion.getId(), reclaimerRegion.getLayer());
+			Pair<Long, Long> range = id.range();
+			Assert.isTrue(range.getKey() <= reclaimee.getRegion() && range.getValue() >= reclaimee.getRegion(), Codes.REGION_UNPERMISSION);
 		}
-		userRegionDao.deleteByQuery(new Query().and(Criteria.eq("uid", reclaimee), Criteria.eq("region", region)));
+		reclaimee.setRegion(0l);
+		reclaimee.setUpdated(DateUtil.current());
+		userManager.update(reclaimee);
 	}
 	
 	public List<SysRegion> regions() {
@@ -249,9 +209,5 @@ public class RegionManager {
 	
 	public SysRegion region(long id) {
 		return sysRegionDao.selectByKey(id);
-	}
-	
-	public List<SysRegion> regions(long uid) {
-		return userRegionDao.regions(uid);
 	}
 }

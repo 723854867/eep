@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Api;
+import org.eep.common.bean.entity.Company;
+import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.entity.UserToken;
 import org.eep.common.bean.model.LoginInfo;
@@ -28,6 +30,7 @@ import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.param.Param;
 import org.rubik.redis.Locker;
 import org.rubik.util.common.DateUtil;
+import org.rubik.util.common.StringUtil;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,10 @@ public class UserManager {
 	private UserDao userDao;
 	@Resource
 	private UserTokenDao userTokenDao;
+	@Resource
+	private RegionManager regionManager;
+	@Resource
+	private CompanyManager companyManager;
 	
 	public void logout(Param param) { 
 		Visitor visitor = param.requestor();
@@ -58,7 +65,9 @@ public class UserManager {
 		userTokenDao.deleteByQuery(new Query().and(Criteria.eq("device", param.getDevice()), Criteria.eq("uid", user.getId())));
 		UserToken token = EntityGenerator.newUserToken(user, param);
 		userTokenDao.insert(token);
-		return new LoginInfo(user, token);
+		Company company = StringUtil.hasText(user.getCid()) ? companyManager.company(user.getCid()) : null;
+		SysRegion region = 0 == user.getRegion() ? null : regionManager.region(user.getRegion());
+		return new LoginInfo(user, company, region, token);
 	}
 	
 	public User create(UserCreateParam param) { 
@@ -100,6 +109,14 @@ public class UserManager {
 	public boolean releaseLock(Visitor visitor) {
 		String key = MessageFormat.format(USER_LOCK_KEY, String.valueOf(visitor.id()));
 		return locker.releaseLock(key, visitor.getLockId());
+	}
+	
+	void update(User user) {
+		userDao.update(user);
+	}
+	
+	void deleteRegion(long min, long max) { 
+		userDao.deleteRegion(min, max);
 	}
 	
 	public User user(long uid) {
