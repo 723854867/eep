@@ -19,9 +19,7 @@ public class Inspect implements Identifiable<Long> {
 	private long id;
 	private long time;
 	private String cid;
-	private String rid;
 	private int created;
-	private long nextTime;
 	private long committer;
 	private String content;
 

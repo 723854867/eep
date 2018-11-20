@@ -19,11 +19,9 @@ public class InspectsParam extends Param {
 	@Null
 	private Long max;
 	private String cid;
-	private String rid;
 	@Min(1)
 	private Long region;
 	private String cname;
-	private String rname;
 	
 	@Override
 	public void verify() {
