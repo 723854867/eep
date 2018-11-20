@@ -29,12 +29,15 @@ import org.eep.common.bean.param.OperatorsParam;
 import org.eep.common.bean.param.RectifyNoticeCreateParam;
 import org.eep.common.bean.param.RectifyNoticesParam;
 import org.eep.mybatis.EntityGenerator;
+import org.eep.service.CommonService;
 import org.eep.service.CompanyService;
 import org.eep.service.RegionService;
 import org.eep.util.RegionUtil;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.model.Code;
+import org.rubik.bean.core.model.Criteria;
+import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
 import org.rubik.bean.core.param.Param;
@@ -53,6 +56,8 @@ public class CompanyController {
 	
 	@javax.annotation.Resource
 	private Uploader uploader;
+	@javax.annotation.Resource
+	private CommonService commonService;
 	@javax.annotation.Resource
 	private RegionService regionService;
 	@javax.annotation.Resource
@@ -200,7 +205,10 @@ public class CompanyController {
 	@RequestMapping("introspect/detail")
 	public Object introspectDetail(@RequestBody @Valid LidParam param) {
 		Introspect introspect = Assert.notNull(companyService.introspect(param.getId()), Codes.INTROSPECT_NOT_EXIST);
-		return new IntrospectDetail(introspect);
+		IntrospectDetail detail = new IntrospectDetail(introspect);
+		Query query = new Query().and(Criteria.eq("type", ResourceType.COMPANY_INTROSPECT), Criteria.eq("owner", param.getId()));
+		detail.setResources(commonService.resources(query).getList());
+		return detail;
 	}
 	
 	/**

@@ -15,6 +15,7 @@ import org.eep.common.bean.param.LawsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.LawCategoryDao;
 import org.eep.mybatis.dao.LawDao;
+import org.eep.mybatis.dao.ResourceDao;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.Query;
@@ -29,6 +30,8 @@ public class CommonManager {
 
 	@Resource
 	private LawDao lawDao;
+	@Resource
+	private ResourceDao resourceDao;
 	@Resource
 	private LawCategoryDao lawCategoryDao;
 	
@@ -90,5 +93,9 @@ public class CommonManager {
 	
 	public List<LawCategory> lawCategories(Query query) {
 		return lawCategoryDao.queryList(query);
+	}
+	
+	public List<org.eep.common.bean.entity.Resource> resources(Query query) {
+		return resourceDao.queryList(query);
 	}
 }

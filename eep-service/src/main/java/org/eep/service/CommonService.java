@@ -59,4 +59,10 @@ public class CommonService {
 			PageHelper.startPage(query.getPage(), query.getPageSize());
 		return PagerUtil.page(commonManager.lawCategories(query));
 	}
+	
+	public Pager<org.eep.common.bean.entity.Resource> resources(Query query) { 
+		if (null != query.getPage())
+			PageHelper.startPage(query.getPage(), query.getPageSize());
+		return PagerUtil.page(commonManager.resources(query));
+	}
 }

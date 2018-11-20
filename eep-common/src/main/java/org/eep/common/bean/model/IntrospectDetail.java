@@ -2,9 +2,11 @@ package org.eep.common.bean.model;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 import org.eep.common.bean.entity.Introspect;
+import org.eep.common.bean.entity.Resource;
 import org.rubik.util.serializer.GsonSerializer;
 
 import com.google.gson.reflect.TypeToken;
@@ -40,6 +42,7 @@ public class IntrospectDetail implements Serializable {
 	private int validPressureGauge;
 	private String legalPersonPhone;
 	private String managementAgency;
+	private List<Resource> resources;
 	private boolean safetyManageSystem;
 	private boolean regularMaintenance;
 	private boolean safetyTechArchives;
