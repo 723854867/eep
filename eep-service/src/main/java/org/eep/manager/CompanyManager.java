@@ -210,6 +210,10 @@ public class CompanyManager {
 		return introspectDao.selectByKey(id);
 	}
 	
+	public List<CompanyTitle> companies() {
+		return companyDao.titles();
+	}
+	
 	public InspectDetail inspectDetail(long id) {
 		return inspectDao.detail(id);
 	}
@@ -247,9 +251,5 @@ public class CompanyManager {
 	
 	public List<RectifyNoticeInfo> rectifyNotices(RectifyNoticesParam param) {
 		return rectifyNoticeDao.list(param);
-	}
-
-	public List<CompanyTitle> companies() {
-		return companyDao.list_();
 	}
 }

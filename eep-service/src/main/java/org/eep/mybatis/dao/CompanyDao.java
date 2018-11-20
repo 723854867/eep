@@ -16,8 +16,8 @@ public interface CompanyDao extends Dao<String, Company> {
 	List<CompanyInfo> list(CompaniesParam param);
 	
 	//只查询名称和id
-	@Select("SELECT id , NAME FROM company WHERE TYPE = 1")
-	List<CompanyTitle> list_();
+	@Select("SELECT id , NAME FROM company WHERE `type` = 1")
+	List<CompanyTitle> titles();
 	
 	List<AlertStatistic> alertStatistic(AlertStatisticParam param);
 }

@@ -16,6 +16,7 @@ import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.InspectDetail;
+import org.eep.common.bean.model.IntrospectDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.CompaniesParam;
@@ -188,6 +189,18 @@ public class CompanyController {
 		Visitor visitor = param.requestor();
 		Assert.isTrue(visitor.getCompany().getType() == CompanyType.USE, Code.FORBID);
 		return companyService.introspectCreate(param);
+	}
+	
+	/**
+	 * 自查自纠详情
+	 * @param param
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("introspect/detail")
+	public Object introspectDetail(@RequestBody @Valid LidParam param) {
+		Introspect introspect = Assert.notNull(companyService.introspect(param.getId()), Codes.INTROSPECT_NOT_EXIST);
+		return new IntrospectDetail(introspect);
 	}
 	
 	/**
