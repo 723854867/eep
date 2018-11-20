@@ -30,7 +30,6 @@ import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
-import org.rubik.bean.core.param.Param;
 import org.rubik.bean.core.param.SidParam;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.KeyUtil;

@@ -10,7 +10,7 @@ import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
-import org.eep.common.bean.model.CompanyInfo_;
+import org.eep.common.bean.model.CompanyTitle;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.InspectInfo;
 import org.eep.common.bean.model.IntrospectInfo;
@@ -95,7 +95,7 @@ public class CompanyService {
 		return PagerUtil.page(companyManager.companies(param));
 	}
 	
-	public List<CompanyInfo_> companies() {
+	public List<CompanyTitle> companies() {
 		return companyManager.companies();
 	}
 	

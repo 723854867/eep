@@ -36,6 +36,7 @@ import org.eep.sync.mybatis.dao.ViewTsOrganizationDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorcertDao;
 import org.rubik.bean.core.Assert;
+import org.rubik.bean.core.exception.AssertException;
 import org.rubik.redis.Locker;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.CollectionUtil;
@@ -146,9 +147,15 @@ public class SyncService{
 					organization.setAreacode("3303274000");
 				if (organization.getAreacode().equals("3303030300"))
 					organization.setAreacode("3303031100");
+				if (organization.getAreacode().equals("3205840000"))
+					organization.setAreacode("320509000000");
+				if (organization.getAreacode().equals("33018300000"))
+					organization.setAreacode("330111000000");
+				if (organization.getAreacode().equals("3310210000"))
+					organization.setAreacode("331083000000");
 				SysRegion region = regions.get(organization.getAreacode());
 				if (null == region)
-					throw new RuntimeException("未识别的行政区划代码");
+					throw AssertException.error(Codes.REGION_CODE_UNRECOGNIZE, organization.getAreacode());
 				company.setRegion(region.getId());
 				companies.put(company.getId(), company);
 			} else 

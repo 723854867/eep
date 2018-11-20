@@ -44,6 +44,8 @@ public interface Codes {
 	public static final Code REPAIR_DEVICE_MAXIMUM		= Code.create("code.repair.device.maximum");
 	// 法律法规类型不存在
 	public static final Code LAW_CATEGORY_NOT_EXIST		= Code.create("code.law.category.not.exist");
+	// 
+	public static final Code REGION_CODE_UNRECOGNIZE	= Code.create("code.region.code.unrecognize");
 	// 父级地区不存在
 	public static final Code REGION_PARENT_NOT_EXIST	= Code.create("code.region.parent.not.exist");
 	// 整改通知不存在

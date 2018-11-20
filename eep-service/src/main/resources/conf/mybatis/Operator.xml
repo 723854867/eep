@@ -11,9 +11,21 @@
 			operator c 
 		LEFT JOIN
 			(
-				SELECT * FROM operator_cert WHERE id IN (
-					SELECT SUBSTRING_INDEX(GROUP_CONCAT(id ORDER BY expire_time DESC), ',', 1) id
-                   	FROM operator_cert GROUP BY operator_id)
+				SELECT 
+					b.* 
+				FROM
+					(
+					SELECT 
+						SUBSTRING_INDEX(GROUP_CONCAT(id ORDER BY expire_time DESC), ',', 1) id 
+					FROM 
+						operator_cert 
+					GROUP BY 
+						operator_id
+					) a 
+				LEFT JOIN 
+					operator_cert b 
+				ON 
+					a.id=b.id
 			)d 
 		ON c.id=d.operator_id
 		LEFT JOIN 
