@@ -36,6 +36,7 @@ import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
+import org.rubik.bean.core.param.Param;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.KeyUtil;
 import org.rubik.web.Uploader;
@@ -68,6 +69,15 @@ public class CompanyController {
 		if (null != param.getRegion()) 
 			RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return companyService.companies(param);
+	}
+	
+	/**
+	 * 使用单位列表所有(不分页)
+	 */
+	@ResponseBody
+	@RequestMapping("list/use/all")
+	public Object uses_(@RequestBody @Valid Param param) {
+		return companyService.companies();
 	}
 	
 	/**

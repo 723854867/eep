@@ -31,7 +31,7 @@ public class OperatorCertsParam extends Param {
 			criterias.add(Criteria.eq("certno", certno));
 		if (StringUtil.hasText(operatorId))
 			criterias.add(Criteria.eq("operator_id", operatorId));
-		return query;
+		return query.and(criterias);
 	}
 
 	@Override

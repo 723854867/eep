@@ -18,6 +18,7 @@ import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
+import org.eep.common.bean.model.CompanyInfo_;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.InspectInfo;
 import org.eep.common.bean.model.IntrospectInfo;
@@ -246,5 +247,9 @@ public class CompanyManager {
 	
 	public List<RectifyNoticeInfo> rectifyNotices(RectifyNoticesParam param) {
 		return rectifyNoticeDao.list(param);
+	}
+
+	public List<CompanyInfo_> companies() {
+		return companyDao.list_();
 	}
 }
