@@ -17,7 +17,7 @@ public class UserCreateParam extends Param {
 	private static final long serialVersionUID = 3273014628371274644L;
 
 	@NotEmpty
-	@Size(min = Consts.DEFAULT_MIN_PARAM_LEN, max = Consts.DEFAULT_MAX_PARAM_LEN)
+	@Size(min = 2,max = Consts.DEFAULT_MAX_PARAM_LEN)
 	private String uname;
 	@Mobile
 	@NotEmpty

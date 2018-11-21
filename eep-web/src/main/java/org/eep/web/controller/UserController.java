@@ -12,6 +12,7 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
+import org.eep.common.bean.param.UserModifyParam;
 import org.eep.common.bean.param.UsersParam;
 import org.eep.service.CompanyService;
 import org.eep.service.RegionService;
@@ -81,6 +82,13 @@ public class UserController {
 	public Object create(@RequestBody @Valid UserCreateParam param) {
 		User user = userService.create(param);
 		return new UserInfo(user);
+	}
+	
+	@ResponseBody
+	@RequestMapping("modify")
+	public Object modify(@RequestBody @Valid UserModifyParam param) {
+		userService.modify(param);
+		return Result.ok();
 	}
 	
 	@ResponseBody
