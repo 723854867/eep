@@ -36,8 +36,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.experimental.var;
-
 @Component
 public class UserManager {
 	
@@ -92,6 +90,8 @@ public class UserManager {
 			user.setNickname(param.getNickname());
 		if(null != param.getCornette())
 			user.setCornette(param.getCornette());
+		if(null != param.getPassword())
+			user.setPwd(DigestUtils.md5Hex(param.getPassword() + "_" + user.getSalt()));
 		user.setUpdated(DateUtil.current());
 		userDao.update(user);
 	}
