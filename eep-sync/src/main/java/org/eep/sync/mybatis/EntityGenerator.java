@@ -63,7 +63,6 @@ public class EntityGenerator {
 		instance.setContact(StringUtil.hasText(temp.getContact()) ? temp.getContact() : StringUtil.EMPTY);
 		instance.setLevel(StringUtil.hasText(temp.getEqulevel()) ? temp.getEqulevel() : StringUtil.EMPTY);
 		instance.setModel(StringUtil.hasText(temp.getEqumodel()) ? temp.getEqumodel() : StringUtil.EMPTY);
-		instance.setSafeLevel(StringUtil.hasText(temp.getSaflevel()) ? temp.getSaflevel() : StringUtil.EMPTY);
 		instance.setCode(StringUtil.hasText(temp.getEqusortname()) ? temp.getEqusortname() : StringUtil.EMPTY);
 		instance.setAddress(StringUtil.hasText(temp.getEquaddress()) ? temp.getEquaddress() : StringUtil.EMPTY);
 		instance.setAgeState(StringUtil.hasText(temp.getEqudepcase()) ? temp.getEqudepcase() : StringUtil.EMPTY);

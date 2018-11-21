@@ -46,8 +46,6 @@ public class Device implements Identifiable<String> {
 	private String ageState;
 	// 适用场合
 	private String occasion;
-	// 安全级别
-	private String safeLevel;
 	// 注册登记机构
 	private String regOrgName;
 	// 登记表编号

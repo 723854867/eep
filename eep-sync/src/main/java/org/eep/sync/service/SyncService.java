@@ -36,7 +36,6 @@ import org.eep.sync.mybatis.dao.ViewTsOrganizationDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorDao;
 import org.eep.sync.mybatis.dao.ViewTsPeroperatorcertDao;
 import org.rubik.bean.core.Assert;
-import org.rubik.bean.core.exception.AssertException;
 import org.rubik.redis.Locker;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.CollectionUtil;
@@ -101,6 +100,7 @@ public class SyncService{
 			operatorDao.deleteAll();
 			logExamineDao.deleteAll();
 			operatorCertDao.deleteAll();
+			deviceCategoryDao.deleteAll();
 			_syncCompany();
 			_syncDeviceCategory();
 			_syncDevice();
@@ -154,10 +154,12 @@ public class SyncService{
 				if (organization.getAreacode().equals("3310210000"))
 					organization.setAreacode("331083000000");
 				SysRegion region = regions.get(organization.getAreacode());
-				if (null == region)
-					throw AssertException.error(Codes.REGION_CODE_UNRECOGNIZE, organization.getAreacode());
-				company.setRegion(region.getId());
-				companies.put(company.getId(), company);
+				if (null == region) 
+					log.error("单位 - {} 行政区划代码 - {} 无法识别，不迁移该单位！", organization.getSid(), organization.getAreacode());
+				else {
+					company.setRegion(region.getId());
+					companies.put(company.getId(), company);
+				}
 			} else 
 				log.warn("单位 - {} 类型 - {} 不识别，不迁移该单位！", organization.getSid(), organization.getOrgtype());
 		});

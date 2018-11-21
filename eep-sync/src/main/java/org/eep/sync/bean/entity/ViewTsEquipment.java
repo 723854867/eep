@@ -65,7 +65,7 @@ public class ViewTsEquipment implements Identifiable<String> {
 	// 设备级别(device.level)
 	private String equlevel;
 	// 安全级别(device.safeLevel)
-	private String saflevel;
+//	private String saflevel;
 	// 设备新旧状况(device.ageState)
 	private String equdepcase;
 	// 重点监控等级：1-重点监控；A-一级监控；B-二级重点监控；C-三级重点监控(device.guardLevel)
