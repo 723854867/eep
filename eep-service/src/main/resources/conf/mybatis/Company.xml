@@ -49,6 +49,26 @@
 		order by warn_level desc
 	</select>
 	
+	<select id="titles" parameterType="org.eep.common.bean.param.CompaniesParam" resultType="org.eep.common.bean.model.CompanyTitle">
+		SELECT 
+			a.id,
+			a.name
+		FROM 
+			company a
+		<where>
+			<if test="null != min">
+				<![CDATA[ AND a.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND a.region <= #{max} ]]>
+			</if>
+			<if test="null != type">
+					AND a.type=#{type}
+			</if>
+		</where>
+	</select>
+	
+	
 	<select id="alertStatistic" parameterType="org.eep.common.bean.param.AlertStatisticParam" resultType="org.eep.common.bean.model.AlertStatistic">
 		SELECT 
 			warn_level, 

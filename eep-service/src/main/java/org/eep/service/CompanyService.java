@@ -97,8 +97,8 @@ public class CompanyService {
 		return PagerUtil.page(companyManager.companies(param));
 	}
 	
-	public List<CompanyTitle> companies() {
-		return companyManager.companies();
+	public List<CompanyTitle> companiesTitle(CompaniesParam param) {
+		return companyManager.companiesTitle(param);
 	}
 	
 	public Pager<AlertInfo> alerts(AlertsParam param) {

@@ -83,8 +83,12 @@ public class CompanyController {
 	 */
 	@ResponseBody
 	@RequestMapping("list/use/all")
-	public Object uses_(@RequestBody @Valid Param param) {
-		return companyService.companies();
+	public Object uses_(@RequestBody @Valid CompaniesParam param) {
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		SysRegion region = regionService.userRegionVerify(param.requestor(), param.getRegion());
+		RegionUtil.setRange(param, region);
+		param.setType(CompanyType.USE);
+		return companyService.companiesTitle(param);
 	}
 	
 	/**

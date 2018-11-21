@@ -212,8 +212,8 @@ public class CompanyManager {
 		return introspectDao.selectByKey(id);
 	}
 	
-	public List<CompanyTitle> companies() {
-		return companyDao.titles();
+	public List<CompanyTitle> companiesTitle(CompaniesParam param) {
+		return companyDao.titles(param);
 	}
 	
 	public InspectDetail inspectDetail(long id) {
