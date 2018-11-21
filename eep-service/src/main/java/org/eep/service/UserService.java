@@ -12,6 +12,7 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
+import org.eep.common.bean.param.UserModifyParam;
 import org.eep.common.bean.param.UsersParam;
 import org.eep.manager.CompanyManager;
 import org.eep.manager.RegionManager;
@@ -52,6 +53,10 @@ public class UserService {
 	
 	public User create(UserCreateParam param) {
 		return userManager.create(param);
+	}
+	
+	public void modify(UserModifyParam param) {
+		userManager.modify(param);
 	}
 	
 	public void pwdModify(PwdModifyParam param) {

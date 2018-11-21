@@ -18,6 +18,7 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.LoginParam;
 import org.eep.common.bean.param.PwdModifyParam;
 import org.eep.common.bean.param.UserCreateParam;
+import org.eep.common.bean.param.UserModifyParam;
 import org.eep.common.bean.param.UsersParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.UserDao;
@@ -34,6 +35,8 @@ import org.rubik.util.common.StringUtil;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.experimental.var;
 
 @Component
 public class UserManager {
@@ -78,6 +81,19 @@ public class UserManager {
 			throw AssertException.error(Code.UNAME_EXIST);
 		}
 		return user;
+	}
+	
+	public void modify(UserModifyParam param) {
+		User user = userDao.selectByKey(param.getId());
+		Assert.notNull(user, Codes.UNAME_NOT_EXIST);
+		if(null != param.getMobile())
+			user.setMobile(param.getMobile());
+		if(null != param.getNickname())
+			user.setNickname(param.getNickname());
+		if(null != param.getCornette())
+			user.setCornette(param.getCornette());
+		user.setUpdated(DateUtil.current());
+		userDao.update(user);
 	}
 	
 	public void pwdModify(PwdModifyParam param) {
