@@ -111,7 +111,7 @@ class Configuration {
 	}
 	
 	@Bean("sourceDaoScanner")
-	public DaoScanner daoScanner() {
+	public static DaoScanner daoScanner() {
 		DBConfig dbConfig = dbConfig();
 		DaoScanner scanner = new DaoScanner();
 		DBEntityFactory entityFactory = new DBEntityFactory(dbConfig.getDialect());

@@ -19,6 +19,7 @@ import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.IntrospectDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
+import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
@@ -389,5 +390,30 @@ public class CompanyController {
 			}
 		}
 		return companyService.inspectCreate(param.getCid(), param.getTime(), param.getContent(), param.requestor().id(), resources);
+	}
+	
+	/**
+	 * 警告列表(辖区)
+	 */
+	@ResponseBody
+	@RequestMapping("alerts/area")
+	public Object alertsArea(@RequestBody @Valid AlertsParam param) {
+		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+		regionService.userRegionVerify(param.requestor(), param.getRegion());
+		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		return companyService.alerts(param);
+	}
+	
+	/**
+	 * 警告列表(使用单位)
+	 */
+	@ResponseBody
+	@RequestMapping("alerts/use")
+	public Object alertsUse(@RequestBody @Valid AlertsParam param) {
+		Visitor visitor = param.requestor();
+		Company company = visitor.getCompany();
+		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
+		param.setCid(company.getId());
+		return companyService.alerts(param);
 	}
 }

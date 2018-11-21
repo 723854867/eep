@@ -8,6 +8,7 @@ import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
 import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
+import org.eep.common.bean.model.AlertInfo;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.CompanyTitle;
@@ -17,6 +18,7 @@ import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.RectifyNoticeInfo;
 import org.eep.common.bean.param.AlertStatisticParam;
+import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
@@ -97,6 +99,11 @@ public class CompanyService {
 	
 	public List<CompanyTitle> companies() {
 		return companyManager.companies();
+	}
+	
+	public Pager<AlertInfo> alerts(AlertsParam param) {
+		PageHelper.startPage(param.getPage(), param.getPageSize());
+		return PagerUtil.page(companyManager.alerts(param));
 	}
 	
 	public Pager<OperatorInfo> operators(OperatorsParam param) {
