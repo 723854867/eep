@@ -147,11 +147,11 @@ public class SyncService{
 					organization.setAreacode("3303274000");
 				if (organization.getAreacode().equals("3303030300"))
 					organization.setAreacode("3303031100");
-				if (organization.getAreacode().equals("32058400"))
+				if (organization.getAreacode().equals("3205840000"))
 					organization.setAreacode("3205090000");
-				if (organization.getAreacode().equals("330183000"))
+				if (organization.getAreacode().equals("3301830000"))
 					organization.setAreacode("3301110000");
-				if (organization.getAreacode().equals("33102100"))
+				if (organization.getAreacode().equals("3310210000"))
 					organization.setAreacode("3310830000");
 				if (organization.getAreacode().equals("33038205"))
 					organization.setAreacode("3303820500");
