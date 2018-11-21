@@ -24,5 +24,7 @@ public class UserModifyParam extends Param {
 	@Size(min = 2, max = Consts.DEFAULT_MAX_PARAM_LEN)
 	private String nickname;
 	@Size(min = Consts.DEFAULT_MIN_PARAM_LEN, max = Consts.DEFAULT_MAX_PARAM_LEN)
+	private String password;
+	@Size(min = Consts.DEFAULT_MIN_PARAM_LEN, max = Consts.DEFAULT_MAX_PARAM_LEN)
 	private String cornette;
 }
