@@ -12,13 +12,10 @@
 	<resultMap id="detailMap" type="org.eep.common.bean.model.InspectDetail">
 		<id property="id" column="id"/>
 		<result property="cid" column="cid"/>
-		<result property="rid" column="rid"/>
 		<result property="time" column="time"/>
 		<result property="cname" column="cname"/>
-		<result property="rname" column="rname"/>
 		<result property="created" column="created"/>
 		<result property="content" column="content"/>
-		<result property="nextTime" column="next_time"/>
 		<collection property="resources" resultMap="resourceMap" />
 	</resultMap>
 
@@ -26,40 +23,27 @@
 		SELECT 
 			a.`id`,
 			a.`cid`,
-			a.`rid`,
 			a.`time`,
 			a.`created`,
-			a.`next_time`,
-			b.`name` cname, 
-			c.`name` rname 
+			b.`name` cname
 		FROM 
 			inspect a 
 		LEFT JOIN 
 			company b 
 		ON 
 			a.`cid`=b.`id`
-		LEFT JOIN 
-			company c 
-		ON 
-			a.`rid`=c.`id` 
 		<where>
 			<if test="null != cid">
 				a.`cid`=#{cid}
 			</if>
-			<if test="null != rid">
-				AND a.`rid`=#{rid}
-			</if>
 			<if test="null != min">
-				<![CDATA[ AND c.region >= #{min} ]]>
+				<![CDATA[ AND b.region >= #{min} ]]>
 			</if>
 			<if test="null != max">
-				<![CDATA[ AND c.region <= #{max} ]]>
+				<![CDATA[ AND b.region <= #{max} ]]>
 			</if>
 			<if test="null != cname">
 				AND b.`name` LIKE concat(concat('%',#{cname}),'%')
-			</if>
-			<if test="null != rname">
-				AND c.`name` LIKE concat(concat('%',#{rname}),'%')
 			</if>
 		</where>
 	</select>
@@ -68,13 +52,10 @@
 		SELECT 
 			a.`id`,
 			a.`cid`,
-			a.`rid`,
 			a.`time`,
 			a.`created`,
 			a.`content`,
-			a.`next_time`,
 			b.`name` cname, 
-			c.`name` rname,
 			d.id resource_id, 
 			d.`url`resource_url,
 			d.`name` resource_name,
@@ -85,10 +66,6 @@
 			company b 
 		ON 
 			a.`cid`=b.`id` 
-		LEFT JOIN 
-			company c 
-		ON 
-			a.`rid`=c.`id`
 		LEFT JOIN 
 			resource d 
 		ON 

@@ -14,9 +14,6 @@ public class InspectInfo implements Serializable {
 	private long id;
 	private long time;
 	private String cid;
-	private String rid;
 	private int created;
 	private String cname;
-	private String rname;
-	private long nextTime;
 }

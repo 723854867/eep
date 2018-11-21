@@ -157,7 +157,7 @@ public class DeviceController {
 			Resource resource = EntityGenerator.newResource(file.getSize(), url, path, name, ResourceType.DEVICE_REPAIR, null, ++priority);
 			resources.add(resource);
 		}
-		deviceService.repairCreate(param.getCid(), company.getId(), param.getNextTime(),param.getContent(), visitor.id(), param.getDevices(), resources);
+		deviceService.repairCreate(param.getCid(), visitor.getCompany().getId(), param.getNextTime(),param.getContent(), visitor.id(), param.getDevices(), resources);
 		return Result.ok();
 	}
 	
