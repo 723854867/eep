@@ -55,6 +55,7 @@ import org.rubik.bean.core.param.LidParam;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.CollectionUtil;
 import org.rubik.util.common.DateUtil;
+import org.rubik.util.common.StringUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,12 +88,21 @@ public class CompanyManager {
 	@javax.annotation.Resource
 	private RubikConfigService rubikConfigService;
 	
-	@Transactional
 	public void employeeCreate(EmployeeCreateParam param) {
 		User user = Assert.notNull(userManager.user(param.getUid()), Code.USER_NOT_EIXST);
 		Company company = Assert.notNull(companyDao.selectByKey(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		user.setCid(company.getId());
+		user.setUpdated(DateUtil.current());
+		userManager.update(user);
+	}
+	
+	public void employeeDelete(LidParam param) {
+		User user = Assert.notNull(userManager.user(param.getId()), Code.USER_NOT_EIXST);
+		Assert.hasText(user.getCid(), Codes.NOT_AN_EMPLOYEE);
+		Company company = companyDao.selectByKey(user.getCid());
+		regionService.userRegionVerify(param.requestor(), company.getRegion());
+		user.setCid(StringUtil.EMPTY);
 		user.setUpdated(DateUtil.current());
 		userManager.update(user);
 	}

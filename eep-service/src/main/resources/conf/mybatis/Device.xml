@@ -34,6 +34,12 @@
 			<if test="null != warnLevel">
 				AND d.`warn_level`=#{warnLevel}
 			</if>
+			<if test="null != min">
+				<![CDATA[ AND b.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND b.region <= #{max} ]]>
+			</if>
 			<if test="null != name">
 				AND a.`name` LIKE concat(concat('%',#{name}),'%')
 			</if>

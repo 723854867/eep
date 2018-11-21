@@ -58,6 +58,11 @@ public class DeviceController {
 	@ResponseBody
 	@RequestMapping("list")
 	public Object devices(@RequestBody @Valid DevicesParam param) {
+		if (null != param.getRegion()) {
+			Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
+			regionService.userRegionVerify(param.requestor(), param.getRegion());
+			RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		}
 		return deviceService.devices(param);
 	}
 	

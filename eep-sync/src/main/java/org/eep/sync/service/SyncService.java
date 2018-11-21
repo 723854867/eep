@@ -148,11 +148,15 @@ public class SyncService{
 				if (organization.getAreacode().equals("3303030300"))
 					organization.setAreacode("3303031100");
 				if (organization.getAreacode().equals("3205840000"))
-					organization.setAreacode("320509000000");
-				if (organization.getAreacode().equals("33018300000"))
-					organization.setAreacode("330111000000");
+					organization.setAreacode("3205090000");
+				if (organization.getAreacode().equals("3301830000"))
+					organization.setAreacode("3301110000");
 				if (organization.getAreacode().equals("3310210000"))
-					organization.setAreacode("331083000000");
+					organization.setAreacode("3310830000");
+				if (organization.getAreacode().equals("33038205"))
+					organization.setAreacode("3303820500");
+				if (organization.getAreacode().equals("33038101"))
+					organization.setAreacode("3303810100");
 				SysRegion region = regions.get(organization.getAreacode());
 				if (null == region) 
 					log.error("单位 - {} 行政区划代码 - {} 无法识别，不迁移该单位！", organization.getSid(), organization.getAreacode());

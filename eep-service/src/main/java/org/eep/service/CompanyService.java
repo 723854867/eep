@@ -51,6 +51,10 @@ public class CompanyService {
 		companyManager.employeeCreate(param);
 	}
 	
+	public void employeeDelete(LidParam param) { 
+		companyManager.employeeDelete(param);
+	}
+	
 	public long introspectCreate(IntrospectCreateParam param) { 
 		return companyManager.introspectCreate(param);
 	}
