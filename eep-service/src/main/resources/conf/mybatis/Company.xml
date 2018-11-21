@@ -3,43 +3,47 @@
 <mapper namespace="org.eep.mybatis.dao.CompanyDao" >
 
 	<select id="list" parameterType="org.eep.common.bean.param.CompaniesParam" resultType="org.eep.common.bean.model.CompanyInfo">
-		SELECT 
-			a.*,
-			b.name region_name,
-			IFNULL(c.warn_level, 0) warn_level,
-			IFNULL(d.device_num, 0) device_num
-		FROM 
-			company a
-		LEFT JOIN
-			sys_region b
-		ON
-			a.region=b.id
-		LEFT JOIN
-			(SELECT cid, MAX(warn_level) warn_level FROM alert GROUP BY cid) c
-		ON
-			a.id=c.cid
-		LEFT JOIN
-			(SELECT cid, COUNT(cid) device_num FROM device GROUP BY cid) d
-		ON
-			a.id=d.cid
+		SELECT * FROM (
+			SELECT 
+				a.*,
+				b.name region_name,
+				IFNULL(c.warn_level, 0) warn_level,
+				IFNULL(d.device_num, 0) device_num
+			FROM 
+				company a
+			LEFT JOIN
+				sys_region b
+			ON
+				a.region=b.id
+			LEFT JOIN
+				(SELECT cid, MAX(warn_level) warn_level FROM alert GROUP BY cid) c
+			ON
+				a.id=c.cid
+			LEFT JOIN
+				(SELECT cid, COUNT(cid) device_num FROM device GROUP BY cid) d
+			ON
+				a.id=d.cid
+			<where>
+				<if test="null != id">
+					a.id=#{id}
+				</if>
+				<if test="null != min">
+					<![CDATA[ AND a.region >= #{min} ]]>
+				</if>
+				<if test="null != max">
+					<![CDATA[ AND a.region <= #{max} ]]>
+				</if>
+				<if test="null != type">
+					AND a.type=#{type}
+				</if>
+				<if test="null != name">
+					AND a.`name` LIKE concat(concat('%',#{name}),'%')
+				</if>
+			</where>
+		) e
 		<where>
-			<if test="null != id">
-				a.id=#{id}
-			</if>
-			<if test="null != min">
-				<![CDATA[ AND a.region >= #{min} ]]>
-			</if>
-			<if test="null != max">
-				<![CDATA[ AND a.region <= #{max} ]]>
-			</if>
-			<if test="null != type">
-				AND a.type=#{type}
-			</if>
-			<if test="null != name">
-				AND a.`name` LIKE concat(concat('%',#{name}),'%')
-			</if>
 			<if test="null != warnLevel">
-				AND c.`warn_level`=#{warnLevel}
+				`warn_level`=#{warnLevel}
 			</if>
 		</where>
 		order by warn_level desc

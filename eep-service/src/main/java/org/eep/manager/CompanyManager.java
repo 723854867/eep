@@ -16,6 +16,7 @@ import org.eep.common.bean.enums.AlertType;
 import org.eep.common.bean.enums.AuditType;
 import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.WarnLevel;
+import org.eep.common.bean.model.AlertInfo;
 import org.eep.common.bean.model.AlertStatistic;
 import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.CompanyTitle;
@@ -25,6 +26,7 @@ import org.eep.common.bean.model.IntrospectInfo;
 import org.eep.common.bean.model.OperatorInfo;
 import org.eep.common.bean.model.RectifyNoticeInfo;
 import org.eep.common.bean.param.AlertStatisticParam;
+import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
@@ -216,6 +218,10 @@ public class CompanyManager {
 	
 	public InspectDetail inspectDetail(long id) {
 		return inspectDao.detail(id);
+	}
+	
+	public List<AlertInfo> alerts(AlertsParam param) {
+		return alertDao.list(param);
 	}
 	
 	/**

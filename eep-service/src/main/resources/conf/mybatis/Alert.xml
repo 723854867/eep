@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.eep.mybatis.dao.AlertDao" >
+
+	<select id="list" parameterType="org.eep.common.bean.param.AlertsParam" resultType="org.eep.common.bean.model.AlertInfo">
+		SELECT 
+			a.*, 
+			b.`name` cname, 
+			c.`name` dname
+		FROM 
+			alert a 
+		LEFT JOIN 
+			company b 
+		ON 
+			a.cid=b.`id` 
+		LEFT JOIN 
+			device c 
+		ON 
+			a.`device_id`=c.`id`
+		<where>
+			<if test="null != id">
+				a.id=#{id}
+			</if>
+			<if test="null != cid">
+				AND a.cid=#{cid}
+			</if>
+			<if test="null != type">
+				AND a.alert_type=#{type}
+			</if>
+			<if test="null != rectifyId">
+				AND a.rectify_id=#{rectifyId}
+			</if>
+			<if test="null != deviceId">
+				AND a.device_id=#{deviceId}
+			</if>
+			<if test="null != warnLevel">
+				AND a.warn_level=#{warnLevel}
+			</if>
+			<if test="null != min">
+				<![CDATA[ AND b.region >= #{min} ]]>
+			</if>
+			<if test="null != max">
+				<![CDATA[ AND b.region <= #{max} ]]>
+			</if>
+			<if test="null != cname">
+				AND b.`name` LIKE concat(concat('%',#{cname}),'%')
+			</if>
+			<if test="null != dname">
+				AND c.`name` LIKE concat(concat('%',#{dname}),'%')
+			</if>
+		</where>
+	</select>
+</mapper>
