@@ -136,6 +136,16 @@ public class CompanyController {
 	}
 	
 	/**
+	 * 删除雇员
+	 */
+	@ResponseBody
+	@RequestMapping("employee/delete")
+	public Object employeeDelete(@RequestBody @Valid LidParam param) { 
+		companyService.employeeDelete(param);
+		return Result.ok();
+	}
+	
+	/**
 	 * 作业人员列表
 	 */
 	@ResponseBody

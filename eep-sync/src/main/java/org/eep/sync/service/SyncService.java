@@ -153,6 +153,10 @@ public class SyncService{
 					organization.setAreacode("330111000000");
 				if (organization.getAreacode().equals("3310210000"))
 					organization.setAreacode("331083000000");
+				if (organization.getAreacode().equals("33038205"))
+					organization.setAreacode("3303820500");
+				if (organization.getAreacode().equals("33038101"))
+					organization.setAreacode("3303810100");
 				SysRegion region = regions.get(organization.getAreacode());
 				if (null == region) 
 					log.error("单位 - {} 行政区划代码 - {} 无法识别，不迁移该单位！", organization.getSid(), organization.getAreacode());
