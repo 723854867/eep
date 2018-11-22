@@ -70,25 +70,24 @@
 	
 	
 	<select id="alertStatistic" parameterType="org.eep.common.bean.param.AlertStatisticParam" resultType="org.eep.common.bean.model.AlertStatistic">
-		SELECT 
-			warn_level, 
-			SUM(num) num
-		FROM
-			(SELECT 
-				b.num,
-				b.warn_level
+		SELECT
+			warn_level,
+			count(*) num
+		FROM(
+			SELECT 
+				a.*,
+				IFNULL(b.warn_level, 0) warn_level 
 			FROM 
 				company a 
 			LEFT JOIN
 				(SELECT 
-					cid, warn_level, COUNT(*) num 
+					cid, 
+					MAX(warn_level) warn_level 
 				FROM 
 					alert 
-				GROUP BY 
-					cid, warn_level
-				) b 
+				GROUP BY cid) b
 			ON 
-				a.`id`=b.`cid`
+				a.`id`=b.cid
 			<where>
 				<if test="null != cid">
 					a.id=#{cid}
@@ -100,7 +99,7 @@
 					<![CDATA[ AND a.region <= #{max} ]]>
 				</if>
 			</where>
-			) c 
+			) c
 		GROUP BY warn_level
 	</select>
 </mapper>

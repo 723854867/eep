@@ -41,7 +41,6 @@ import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
-import org.rubik.bean.core.param.Param;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.util.common.KeyUtil;
 import org.rubik.web.Uploader;

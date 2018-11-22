@@ -25,4 +25,6 @@ public class RectifyNoticeInfo implements Serializable {
 	private int closingTime;
 	private RectifyState state;
 	private WarnLevel warnLevel;
+	private String deregulation;
+	private String processBasis;
 }
