@@ -67,9 +67,8 @@ public class DeviceController {
 	@ResponseBody
 	@RequestMapping("list/company")
 	public Object devicesCompany(@RequestBody @Valid DevicesParam param) {
-		Assert.hasText(param.getCid(), Code.PARAM_ERR, "cid miss");
 		Visitor visitor = param.requestor();
-		Assert.isTrue(visitor.getUser().getCid().equals(param.getCid()), Code.FORBID);
+		param.setCid(visitor.getCompany().getId());
 		return deviceService.devices(param);
 	}
 
