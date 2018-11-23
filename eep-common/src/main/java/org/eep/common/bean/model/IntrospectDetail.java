@@ -30,6 +30,7 @@ public class IntrospectDetail implements Serializable {
 	private String filler;
 	private String manager;
 	private String address;
+	private String content;
 	private int safetyValve;
 	private int certificater;
 	private boolean trainPlan;
@@ -58,6 +59,7 @@ public class IntrospectDetail implements Serializable {
 	public IntrospectDetail (Introspect introspect) {
 		this.id = introspect.getId();
 		this.cid = introspect.getCid();
+		this.content = introspect.getContent();
 		this.filler = introspect.getFiller();
 		this.created = introspect.getCreated();
 		this.manager = introspect.getManager();

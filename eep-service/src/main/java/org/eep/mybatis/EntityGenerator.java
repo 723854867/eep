@@ -133,6 +133,7 @@ public class EntityGenerator {
 		instance.setAccidentEmergencyPlan(param.isAccidentEmergencyDrill());
 		instance.setAccidentEmergencyDrill(param.isAccidentEmergencyDrill());
 		instance.setIntrospectItems(GsonSerializer.toJson(param.getItems()));
+		instance.setContent(StringUtil.hasText(param.getContent()) ? param.getContent() : StringUtil.EMPTY);
 		instance.setAddress(StringUtil.hasText(param.getAddress()) ? param.getAddress() : StringUtil.EMPTY);
 		instance.setManager(StringUtil.hasText(param.getManager()) ? param.getManager() : StringUtil.EMPTY);
 		instance.setManagerPhone(StringUtil.hasText(param.getManagerPhone()) ? param.getManagerPhone() : StringUtil.EMPTY);

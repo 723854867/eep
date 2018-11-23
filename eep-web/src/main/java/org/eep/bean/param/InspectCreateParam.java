@@ -22,6 +22,7 @@ public class InspectCreateParam extends Param {
 	@NotEmpty
 	private String cid;
 	private String content;
+	private boolean smsSend;
 	private List<MultipartFile> files;
 	
 	@Override

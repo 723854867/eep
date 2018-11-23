@@ -24,6 +24,7 @@ public class Introspect implements Identifiable<Long> {
 	// 专职人数
 	private int fullTime;
 	private String filler;
+	private String content;
 	private String manager;
 	private String address;
 	// 在用安全阀数量

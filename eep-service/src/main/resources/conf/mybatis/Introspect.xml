@@ -9,6 +9,7 @@
 			a.legal_person,
 			a.filler,
 			a.created,
+			a.content,
 			a.filler_phone
 		FROM 
 			introspect a
@@ -17,8 +18,11 @@
 		ON
 			a.cid=b.id
 		<where>
+			<if test="null != cid">
+				a.cid=#{cid}
+			</if>
 			<if test="null != name">
-				b.`name` LIKE concat(concat('%',#{name}),'%')
+				AND b.`name` LIKE concat(concat('%',#{name}),'%')
 			</if>
 		</where>
 	</select>

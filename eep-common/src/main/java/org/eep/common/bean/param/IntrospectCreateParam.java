@@ -24,6 +24,7 @@ public class IntrospectCreateParam extends Param {
 	private int fullTime;
 	@NotEmpty
 	private String filler;
+	private String content;
 	private String manager;
 	private String address;
 	private int safetyValve;

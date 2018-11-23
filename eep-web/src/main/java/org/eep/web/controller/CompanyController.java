@@ -8,9 +8,13 @@ import javax.validation.Valid;
 
 import org.eep.bean.param.InspectCreateParam;
 import org.eep.bean.param.IntrospectUploadParam;
+import org.eep.chuanglan.ChuangLanApi;
+import org.eep.chuanglan.model.VarSmsRequest;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Company;
+import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
+import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.enums.CompanyType;
@@ -36,13 +40,18 @@ import org.eep.service.RegionService;
 import org.eep.util.RegionUtil;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
+import org.rubik.bean.core.enums.Locale;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
+import org.rubik.bean.core.param.Param;
 import org.rubik.soa.config.api.RubikConfigService;
+import org.rubik.soa.config.bean.entity.SysWord;
 import org.rubik.util.common.KeyUtil;
+import org.rubik.util.common.PhoneUtil;
+import org.rubik.util.common.StringUtil;
 import org.rubik.web.Uploader;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +66,8 @@ public class CompanyController {
 	@javax.annotation.Resource
 	private Uploader uploader;
 	@javax.annotation.Resource
+	private ChuangLanApi chuangLanApi;
+	@javax.annotation.Resource
 	private CommonService commonService;
 	@javax.annotation.Resource
 	private RegionService regionService;
@@ -64,6 +75,13 @@ public class CompanyController {
 	private CompanyService companyService;
 	@javax.annotation.Resource
 	private RubikConfigService rubikConfigService;
+	
+	@ResponseBody
+	@RequestMapping("info")
+	public Object info(@RequestBody @Valid Param param) {
+		Visitor visitor = param.requestor();
+		return visitor.getCompany();
+	}
 	
 	/**
 	 * 使用单位列表所有
@@ -288,7 +306,14 @@ public class CompanyController {
 		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
-		return companyService.rectifyNoticeCreate(param);
+		RectifyNotice notice = companyService.rectifyNoticeCreate(param);
+		if (param.isSmsSend() && StringUtil.hasText(company.getContactsPhone()) && PhoneUtil.isMobile(company.getContactsPhone())) {
+			VarSmsRequest request = new VarSmsRequest();
+			SysWord word = rubikConfigService.word("rectify_word_sms", Locale.ZH_CN);
+			request.msg(word.getValue());
+			request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(company.getContactsPhone())), company.getName());
+		}
+		return notice;
 	}
 	
 	/**
@@ -339,13 +364,12 @@ public class CompanyController {
 	}
 	
 	/**
-	 * 检查记录(使用单位)
+	 * 检查记录(单位)
 	 */
 	@ResponseBody
 	@RequestMapping("inspects/use")
 	public Object inspectsUse(@RequestBody @Valid InspectsParam param) {
 		Visitor visitor = param.requestor();
-		Assert.isTrue(visitor.getCompany().getType() == CompanyType.USE, Code.FORBID);
 		param.setCid(visitor.getCompany().getId());
 		return companyService.inspects(param);
 	}
@@ -370,7 +394,6 @@ public class CompanyController {
 	public Object inspectDetailUse(@RequestBody @Valid LidParam param) {
 		Visitor visitor = param.requestor();
 		Company company = visitor.getCompany();
-		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
 		Assert.isTrue(detail.getCid().equals(company.getId()));
 		return detail;
@@ -383,7 +406,6 @@ public class CompanyController {
 	@RequestMapping("inspect/create")
 	public Object inspectCreate(InspectCreateParam param) { 
 		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
-		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		int resourceMaximum = rubikConfigService.config(Constants.RESOURCE_MAXIMUM_INSPECT);
 		Assert.isTrue(null == param.getFiles() || param.getFiles().size() <= resourceMaximum, Codes.RESOURCE_MAXIMUM);
@@ -402,7 +424,15 @@ public class CompanyController {
 				resources.add(resource);
 			}
 		}
-		return companyService.inspectCreate(param.getCid(), param.getTime(), param.getContent(), param.requestor().id(), resources);
+		Inspect inspect = companyService.inspectCreate(param.getCid(), param.getTime(), param.getContent(), param.requestor().id(), resources);
+		if (param.isSmsSend() && StringUtil.hasText(company.getContactsPhone()) && PhoneUtil.isMobile(company.getContactsPhone())) {
+			VarSmsRequest request = new VarSmsRequest();
+			SysWord word = rubikConfigService.word("rectify_word_inspect", Locale.ZH_CN);
+			request.msg(word.getValue());
+			request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(company.getContactsPhone())), company.getName());
+			chuangLanApi.sendSms(request);
+		}
+		return inspect;
 	}
 	
 	/**

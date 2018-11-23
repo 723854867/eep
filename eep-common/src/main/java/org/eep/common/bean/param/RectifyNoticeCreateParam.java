@@ -25,6 +25,7 @@ public class RectifyNoticeCreateParam extends Param {
 	@NotEmpty
 	private String measure;
 	private int closingTime;
+	private boolean smsSend;
 	@NotEmpty
 	private String deregulation;
 	@NotEmpty

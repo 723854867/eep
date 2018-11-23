@@ -18,5 +18,5 @@ public class IntrospectInfo {
 	private int created;
 	//填报人电话
 	private String fillerPhone;
-	
+	private String content;
 }
