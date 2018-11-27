@@ -51,4 +51,8 @@
 			</if>
 		</where>
 	</select>
+	
+	<select id="nextExamineTime" resultType="java.lang.Long">
+		SELECT next_time FROM log_examine WHERE device_id=#{id} ORDER BY next_time DESC LIMIT 1
+	</select>
 </mapper>

@@ -131,6 +131,10 @@ public class DeviceManager {
 		log.info("设备状态更新结束！");
 	}
 	
+	public Long nextExamineTime(String id) {
+		return deviceDao.nextExamineTime(id);
+	}
+	
 	public List<DeviceCategory> categories(Query query) {
 		return deviceCategoryDao.queryList(query);
 	}

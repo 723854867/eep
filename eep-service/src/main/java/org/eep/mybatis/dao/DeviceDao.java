@@ -9,5 +9,7 @@ import org.rubik.mybatis.extension.Dao;
 
 public interface DeviceDao extends Dao<String, Device> {
 
+	Long nextExamineTime(String id);
+	
 	List<DeviceInfo> list(DevicesParam param);
 }

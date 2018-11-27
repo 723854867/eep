@@ -49,6 +49,10 @@ public class DeviceService {
 		deviceManager.alertCheck();
 	}
 	
+	public Long nextExamineTime(String id) {
+		return deviceManager.nextExamineTime(id);
+	}
+	
 	public List<Device> devices(Set<String> ids) {
 		return deviceManager.devices(ids);
 	}

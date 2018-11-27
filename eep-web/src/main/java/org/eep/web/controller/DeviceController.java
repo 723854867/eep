@@ -71,6 +71,12 @@ public class DeviceController {
 		param.setCid(visitor.getCompany().getId());
 		return deviceService.devices(param);
 	}
+	
+	@ResponseBody
+	@RequestMapping("next/examine/time")
+	public Object nextExamineTime(@RequestBody @Valid SidParam param) {
+		return deviceService.nextExamineTime(param.getId());
+	}
 
 	/**
 	 * 维保记录列表(辖区)
