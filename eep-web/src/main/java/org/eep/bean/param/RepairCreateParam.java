@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
 
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.model.Code;
@@ -34,7 +33,6 @@ public class RepairCreateParam extends Param {
 	@DecimalMax("90")
 	@DecimalMin("-90")
 	private BigDecimal latitude;
-	@NotNull
 	@DecimalMax("180")
 	@DecimalMin("-180")
 	private BigDecimal longitude;
@@ -44,15 +42,13 @@ public class RepairCreateParam extends Param {
 	public void verify() {
 		super.verify();
 		Assert.hasText(cid, Code.PARAM_ERR, "cid miss");
-		Assert.notNull(latitude, Code.PARAM_ERR, "latitude miss");
-		Assert.notNull(longitude, Code.PARAM_ERR, "longitude miss");
 		Assert.isTrue(!CollectionUtil.isEmpty(files), Code.PARAM_ERR, "files is empty");
 		Assert.isTrue(!CollectionUtil.isEmpty(devices), Code.PARAM_ERR, "devices is empty");
 		Assert.isTrue(nextTime > DateUtil.current(), "next inspect time must large than current time");
-		Assert.isTrue(latitude.compareTo(BigDecimal.valueOf(90)) <= 0, Code.PARAM_ERR, "latitude value large than 90");
-		Assert.isTrue(latitude.compareTo(BigDecimal.valueOf(-90)) >= 0, Code.PARAM_ERR, "latitude value less than -90");
-		Assert.isTrue(longitude.compareTo(BigDecimal.valueOf(180)) <= 0, Code.PARAM_ERR, "longitude value large than 180");
-		Assert.isTrue(longitude.compareTo(BigDecimal.valueOf(-180)) >= 0, Code.PARAM_ERR, "longitude value less than -180");
+		if (null == latitude)
+			this.latitude = BigDecimal.ZERO;
+		if (null == longitude)
+			this.longitude = BigDecimal.ZERO;
 		this.latitude = this.latitude.setScale(7, RoundingMode.HALF_UP);
 		this.longitude = this.longitude.setScale(7, RoundingMode.HALF_UP);
 	}
