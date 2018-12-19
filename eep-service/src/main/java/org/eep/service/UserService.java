@@ -1,5 +1,7 @@
 package org.eep.service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.eep.common.bean.entity.Api;
@@ -78,6 +80,12 @@ public class UserService {
 			visitor.setRegion(region);
 		}
 		return visitor;
+	}
+	
+	public List<UserInfo> getByCid(String cid) { 
+		UsersParam param = new UsersParam();
+		param.setCid(cid);
+		return userManager.users(param);
 	}
 	
 	public Pager<UserInfo> list(UsersParam param) {

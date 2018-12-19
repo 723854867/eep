@@ -21,6 +21,7 @@ import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.IntrospectDetail;
+import org.eep.common.bean.model.UserInfo;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.AlertsParam;
@@ -37,6 +38,7 @@ import org.eep.mybatis.EntityGenerator;
 import org.eep.service.CommonService;
 import org.eep.service.CompanyService;
 import org.eep.service.RegionService;
+import org.eep.service.UserService;
 import org.eep.util.RegionUtil;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
@@ -65,6 +67,8 @@ public class CompanyController {
 	
 	@javax.annotation.Resource
 	private Uploader uploader;
+	@javax.annotation.Resource
+	private UserService userService;
 	@javax.annotation.Resource
 	private ChuangLanApi chuangLanApi;
 	@javax.annotation.Resource
@@ -307,11 +311,17 @@ public class CompanyController {
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		RectifyNotice notice = companyService.rectifyNoticeCreate(param);
-		if (param.isSmsSend() && StringUtil.hasText(company.getContactsPhone()) && PhoneUtil.isMobile(company.getContactsPhone())) {
-			VarSmsRequest request = new VarSmsRequest();
-			SysWord word = rubikConfigService.word("rectify_word_sms", Locale.ZH_CN);
-			request.msg(word.getValue());
-			request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(company.getContactsPhone())), company.getName());
+		if (param.isSmsSend()) {
+			List<UserInfo> users = userService.getByCid(company.getId());
+			users.forEach(user -> {
+				if (StringUtil.hasText(user.getMobile()) && PhoneUtil.isMobile(user.getMobile())) {
+					VarSmsRequest request = new VarSmsRequest();
+					SysWord word = rubikConfigService.word("rectify_word_sms", Locale.ZH_CN);
+					request.msg(word.getValue());
+					request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(user.getMobile())), company.getName());
+					chuangLanApi.sendSms(request);
+				}
+			});
 		}
 		return notice;
 	}
@@ -426,11 +436,16 @@ public class CompanyController {
 		}
 		Inspect inspect = companyService.inspectCreate(param.getCid(), param.getTime(), param.getContent(), param.requestor().id(), resources);
 		if (param.isSmsSend() && StringUtil.hasText(company.getContactsPhone()) && PhoneUtil.isMobile(company.getContactsPhone())) {
-			VarSmsRequest request = new VarSmsRequest();
-			SysWord word = rubikConfigService.word("rectify_word_inspect", Locale.ZH_CN);
-			request.msg(word.getValue());
-			request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(company.getContactsPhone())), company.getName());
-			chuangLanApi.sendSms(request);
+			List<UserInfo> users = userService.getByCid(company.getId());
+			users.forEach(user -> {
+				if (StringUtil.hasText(user.getMobile()) && PhoneUtil.isMobile(user.getMobile())) {
+					VarSmsRequest request = new VarSmsRequest();
+					SysWord word = rubikConfigService.word("rectify_word_inspect", Locale.ZH_CN);
+					request.msg(word.getValue());
+					request.addReceiver(String.valueOf(PhoneUtil.getNationalNumber(user.getMobile())), company.getName());
+					chuangLanApi.sendSms(request);
+				}
+			});
 		}
 		return inspect;
 	}
