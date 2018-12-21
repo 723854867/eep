@@ -77,16 +77,15 @@ public class DeviceController {
 	public Object nextExamineTime(@RequestBody @Valid SidParam param) {
 		return deviceService.nextExamineTime(param.getId());
 	}
-
+	
 	/**
-	 * 维保记录列表(辖区)
+	 * 维保记录列表所有
 	 */
 	@ResponseBody
 	@RequestMapping("repairs/area")
 	public Object repairsArea(@RequestBody @Valid RepairsParam param) {
-		Assert.notNull(param.getRegion(), Code.PARAM_ERR, "param region is null");
-		regionService.userRegionVerify(param.requestor(), param.getRegion());
-		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
+		if (null != param.getRegion())
+			RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return deviceService.repairs(param);
 	}
 	
