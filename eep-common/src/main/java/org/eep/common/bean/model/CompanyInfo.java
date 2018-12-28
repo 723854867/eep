@@ -21,6 +21,7 @@ public class CompanyInfo implements Serializable {
 	private String attr;
 	private int updated;
 	private String name;
+	private String memo;
 	private int deviceNum;
 	private String address;
 	private String contacts;

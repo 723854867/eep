@@ -2,7 +2,6 @@ package org.eep.service;
 
 import java.util.List;
 
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
@@ -20,6 +19,7 @@ import org.eep.common.bean.model.RectifyNoticeInfo;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
+import org.eep.common.bean.param.CompanyModifyParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
@@ -75,11 +75,15 @@ public class CompanyService {
 		return companyManager.inspectCreate(cid, time, content, committer, resources);
 	}
 	
+	public void modify(CompanyModifyParam param) { 
+		companyManager.modify(param);
+	}
+	
 	public void alertCheck() { 
 		companyManager.alertCheck();
 	}
 	
-	public Company company(String id) {
+	public CompanyInfo company(String id) {
 		return companyManager.company(id);
 	}
 	

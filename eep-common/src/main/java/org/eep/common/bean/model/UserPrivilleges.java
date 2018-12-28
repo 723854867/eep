@@ -2,7 +2,6 @@ package org.eep.common.bean.model;
 
 import java.util.List;
 
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 
@@ -23,7 +22,7 @@ public class UserPrivilleges extends UserInfo {
 		super(visitor.getUser(), visitor.company(), visitor.getRegion());
 	}
 	
-	public UserPrivilleges(User user, Company company, SysRegion region) {
+	public UserPrivilleges(User user, CompanyInfo company, SysRegion region) {
 		super(user, company, region);
 	}
 }

@@ -8,10 +8,10 @@ import javax.annotation.Resource;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Api;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.entity.UserToken;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.LoginInfo;
 import org.eep.common.bean.model.UserInfo;
 import org.eep.common.bean.model.Visitor;
@@ -66,7 +66,7 @@ public class UserManager {
 		userTokenDao.deleteByQuery(new Query().and(Criteria.eq("device", param.getDevice()), Criteria.eq("uid", user.getId())));
 		UserToken token = EntityGenerator.newUserToken(user, param);
 		userTokenDao.insert(token);
-		Company company = StringUtil.hasText(user.getCid()) ? companyManager.company(user.getCid()) : null;
+		CompanyInfo company = StringUtil.hasText(user.getCid()) ? companyManager.company(user.getCid()) : null;
 		SysRegion region = 0 == user.getRegion() ? null : regionManager.region(user.getRegion());
 		return new LoginInfo(user, company, region, token);
 	}

@@ -5,9 +5,9 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.eep.common.bean.entity.Api;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.LoginInfo;
 import org.eep.common.bean.model.UserInfo;
 import org.eep.common.bean.model.Visitor;
@@ -72,7 +72,7 @@ public class UserService {
 		else 
 			visitor = userManager.lockVisitorByToken(api, token);
 		if (StringUtil.hasText(visitor.getUser().getCid())) {
-			Company company = companyManager.company(visitor.getUser().getCid());
+			CompanyInfo company = companyManager.company(visitor.getUser().getCid());
 			visitor.setCompany(company);
 		}
 		if (0 != visitor.getUser().getRegion()) {

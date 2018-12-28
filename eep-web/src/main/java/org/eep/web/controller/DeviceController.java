@@ -9,11 +9,11 @@ import javax.validation.Valid;
 import org.eep.bean.param.RepairCreateParam;
 import org.eep.common.Codes;
 import org.eep.common.Consts;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
@@ -109,7 +109,7 @@ public class DeviceController {
 	public Object repairDetail(@RequestBody @Valid LidParam param) {
 		RepairDetail detail = deviceService.repairDetail(param.getId());
 		if (null != detail) {		// 检测区域权限
-			Company company = companyService.company(detail.getCid());
+			CompanyInfo company = companyService.company(detail.getCid());
 			regionService.userRegionVerify(param.requestor(), company.getRegion());
 		}
 		return detail;
@@ -122,7 +122,7 @@ public class DeviceController {
 	@RequestMapping("repair/detail/repair")
 	public Object inspectDetailRepair(@RequestBody @Valid LidParam param) {
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		Assert.isTrue(company.getType() == CompanyType.REPAIR, Code.FORBID);
 		RepairDetail detail = deviceService.repairDetail(param.getId());
 		Assert.isTrue(detail.getRid().equals(company.getId()));
@@ -142,7 +142,7 @@ public class DeviceController {
 		Assert.isTrue(param.getFiles().size() <= resourceMaximum, Codes.RESOURCE_MAXIMUM);
 		int deviceMaximum = rubikConfigService.config(Constants.DEVICE_MAXIMUM_REPAIR);
 		Assert.isTrue(param.getDevices().size() <= deviceMaximum, Codes.DEVICE_MAXIMUM);
-		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		CompanyInfo company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		// 上传设备所在单位必须是使用单位
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		// 设备数目不可以超过指定的数量

@@ -2,7 +2,6 @@ package org.eep.common.bean.model;
 
 import java.io.Serializable;
 
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.entity.UserToken;
@@ -19,7 +18,7 @@ public class LoginInfo implements Serializable {
 	private String token;
 	private UserPrivilleges user;
 	
-	public LoginInfo(User user, Company company, SysRegion region, UserToken token) {
+	public LoginInfo(User user, CompanyInfo company, SysRegion region, UserToken token) {
 		this.token = token.getToken();
 		this.user = new UserPrivilleges(user, company, region);
 	}

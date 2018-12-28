@@ -11,7 +11,6 @@ import org.eep.bean.param.IntrospectUploadParam;
 import org.eep.chuanglan.ChuangLanApi;
 import org.eep.chuanglan.model.VarSmsRequest;
 import org.eep.common.Codes;
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.RectifyNotice;
@@ -19,6 +18,7 @@ import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.InspectDetail;
 import org.eep.common.bean.model.IntrospectDetail;
 import org.eep.common.bean.model.UserInfo;
@@ -26,6 +26,7 @@ import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
+import org.eep.common.bean.param.CompanyModifyParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
@@ -51,6 +52,7 @@ import org.rubik.bean.core.param.LidParam;
 import org.rubik.bean.core.param.Param;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.soa.config.bean.entity.SysWord;
+import org.rubik.util.common.CollectionUtil;
 import org.rubik.util.common.KeyUtil;
 import org.rubik.util.common.PhoneUtil;
 import org.rubik.util.common.StringUtil;
@@ -84,7 +86,21 @@ public class CompanyController {
 	@RequestMapping("info")
 	public Object info(@RequestBody @Valid Param param) {
 		Visitor visitor = param.requestor();
-		return visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
+		List<UserInfo> users = userService.getByCid(company.getId());
+		if (!CollectionUtil.isEmpty(users)) {
+			UserInfo info = users.iterator().next();
+			company.setContacts(info.getNickname());
+			company.setContactsPhone(info.getMobile());
+		}
+		return company;
+	}
+	
+	@ResponseBody
+	@RequestMapping("modify")
+	public Object modify(@RequestBody @Valid CompanyModifyParam param) {
+		companyService.modify(param);
+		return Result.ok();
 	}
 	
 	/**
@@ -186,7 +202,7 @@ public class CompanyController {
 	@RequestMapping("operators/employee")
 	public Object operatorsEmployee(@RequestBody @Valid OperatorsParam param) { 
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		param.setCid(company.getId());
 		return companyService.operators(param);
 	}
@@ -295,7 +311,7 @@ public class CompanyController {
 	@RequestMapping("rectify/notice/list/use")
 	public Object rectifyNoticesUse(@RequestBody @Valid RectifyNoticesParam param) { 
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		param.setCname(null);
 		param.setCid(company.getId());
 		return companyService.rectifyNotices(param);
@@ -307,7 +323,7 @@ public class CompanyController {
 	@ResponseBody
 	@RequestMapping("rectify/notice/create")
 	public Object rectifyNoticeCreate(@RequestBody @Valid RectifyNoticeCreateParam param) { 
-		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		CompanyInfo company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		RectifyNotice notice = companyService.rectifyNoticeCreate(param);
@@ -355,7 +371,7 @@ public class CompanyController {
 	@RequestMapping("alert/statistic/use")
 	public Object alertStatisticUse(@RequestBody @Valid AlertStatisticParam param) { 
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		param.setCid(company.getId());
 		return companyService.alertStatistic(param);
@@ -391,7 +407,7 @@ public class CompanyController {
 	@RequestMapping("inspect/detail")
 	public Object inspectDetailArea(@RequestBody @Valid LidParam param) {
 		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
-		Company company = companyService.company(detail.getCid());
+		CompanyInfo company = companyService.company(detail.getCid());
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		return detail;
 	}
@@ -403,7 +419,7 @@ public class CompanyController {
 	@RequestMapping("inspect/detail/use")
 	public Object inspectDetailUse(@RequestBody @Valid LidParam param) {
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		InspectDetail detail = Assert.notNull(companyService.inspectDetail(param.getId()), Codes.INSPECT_NOT_EXIST);
 		Assert.isTrue(detail.getCid().equals(company.getId()));
 		return detail;
@@ -415,7 +431,7 @@ public class CompanyController {
 	@ResponseBody
 	@RequestMapping("inspect/create")
 	public Object inspectCreate(InspectCreateParam param) { 
-		Company company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
+		CompanyInfo company = Assert.notNull(companyService.company(param.getCid()), Codes.COMPANY_NOT_EXIST);
 		regionService.userRegionVerify(param.requestor(), company.getRegion());
 		int resourceMaximum = rubikConfigService.config(Constants.RESOURCE_MAXIMUM_INSPECT);
 		Assert.isTrue(null == param.getFiles() || param.getFiles().size() <= resourceMaximum, Codes.RESOURCE_MAXIMUM);
@@ -469,7 +485,7 @@ public class CompanyController {
 	@RequestMapping("alerts/use")
 	public Object alertsUse(@RequestBody @Valid AlertsParam param) {
 		Visitor visitor = param.requestor();
-		Company company = visitor.getCompany();
+		CompanyInfo company = visitor.getCompany();
 		Assert.isTrue(company.getType() == CompanyType.USE, Code.FORBID);
 		param.setCid(company.getId());
 		return companyService.alerts(param);

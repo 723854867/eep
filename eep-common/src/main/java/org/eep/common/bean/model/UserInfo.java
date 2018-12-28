@@ -2,7 +2,6 @@ package org.eep.common.bean.model;
 
 import java.io.Serializable;
 
-import org.eep.common.bean.entity.Company;
 import org.eep.common.bean.entity.SysRegion;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.enums.CompanyType;
@@ -43,7 +42,7 @@ public class UserInfo implements Serializable {
 		this.cornette = user.getCornette();
 	}
 	
-	public UserInfo(User user, Company company, SysRegion region) {
+	public UserInfo(User user, CompanyInfo company, SysRegion region) {
 		this.id = user.getId();
 		this.uname = user.getUname();
 		this.mobile = user.getMobile();

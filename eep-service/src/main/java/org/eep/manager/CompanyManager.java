@@ -6,6 +6,7 @@ import java.util.List;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.Company;
+import org.eep.common.bean.entity.CompanyCustom;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.OperatorCert;
@@ -28,6 +29,7 @@ import org.eep.common.bean.model.RectifyNoticeInfo;
 import org.eep.common.bean.param.AlertStatisticParam;
 import org.eep.common.bean.param.AlertsParam;
 import org.eep.common.bean.param.CompaniesParam;
+import org.eep.common.bean.param.CompanyModifyParam;
 import org.eep.common.bean.param.EmployeeCreateParam;
 import org.eep.common.bean.param.InspectsParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
@@ -37,6 +39,7 @@ import org.eep.common.bean.param.RectifyNoticeCreateParam;
 import org.eep.common.bean.param.RectifyNoticesParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.AlertDao;
+import org.eep.mybatis.dao.CompanyCustomDao;
 import org.eep.mybatis.dao.CompanyDao;
 import org.eep.mybatis.dao.InspectDao;
 import org.eep.mybatis.dao.IntrospectDao;
@@ -83,6 +86,8 @@ public class CompanyManager {
 	private IntrospectDao introspectDao;
 	@javax.annotation.Resource
 	private OperatorCertDao operatorCertDao;
+	@javax.annotation.Resource
+	private CompanyCustomDao companyCustomDao;
 	@javax.annotation.Resource
 	private RectifyNoticeDao rectifyNoticeDao;
 	@javax.annotation.Resource
@@ -147,6 +152,18 @@ public class CompanyManager {
 			resourceDao.insertMany(resources);
 		}
 		return inspect;
+	}
+
+	@Transactional
+	public void modify(CompanyModifyParam param) {
+		Assert.notNull(companyDao.selectByKey(param.getId()), Codes.COMPANY_NOT_EXIST);
+		if (null == param.getMemo())
+			param.setMemo(StringUtil.EMPTY);
+		Query query = new Query().and(Criteria.eq("id", param.getId())).forUpdate();
+		CompanyCustom companyCustom = companyCustomDao.queryUnique(query);
+		if (null == companyCustom) 
+			companyCustom = EntityGenerator.newCompanyCustom(param);
+		companyCustomDao.replace(companyCustom);
 	}
 	
 	@Transactional
@@ -214,8 +231,8 @@ public class CompanyManager {
 		log.info("单位状态更新结束！");
 	}
 	
-	public Company company(String id) {
-		return companyDao.selectByKey(id);
+	public CompanyInfo company(String id) {
+		return companyDao.info(id);
 	}
 	
 	public Introspect introspect(long id) {

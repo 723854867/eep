@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.eep.mybatis.dao.CompanyDao" >
 
+	<select id="info" parameterType="java.lang.String" resultType="org.eep.common.bean.model.CompanyInfo">
+		SELECT 
+			a.*, 
+			e.memo,
+			b.name region_name,
+			IFNULL(c.warn_level, 0) warn_level,
+			IFNULL(d.device_num, 0) device_num
+		FROM 
+			company a 
+		LEFT JOIN sys_region b ON a.region=b.id
+		LEFT JOIN (SELECT cid, MAX(warn_level) warn_level FROM alert GROUP BY cid) c ON a.id=c.cid
+		LEFT JOIN (SELECT cid, COUNT(cid) device_num FROM device GROUP BY cid) d ON a.id=d.cid
+		LEFT JOIN company_custom e ON a.id=e.id
+		WHERE a.id=#{id}
+	</select>
+
 	<select id="list" parameterType="org.eep.common.bean.param.CompaniesParam" resultType="org.eep.common.bean.model.CompanyInfo">
 		SELECT * FROM (
 			SELECT 

@@ -2,6 +2,7 @@ package org.eep.mybatis;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.bean.entity.Alert;
+import org.eep.common.bean.entity.CompanyCustom;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
@@ -20,6 +21,7 @@ import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.enums.WarnLevel;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
+import org.eep.common.bean.param.CompanyModifyParam;
 import org.eep.common.bean.param.IntrospectCreateParam;
 import org.eep.common.bean.param.LawCategoryCreateParam;
 import org.eep.common.bean.param.LawCreateParam;
@@ -215,6 +217,13 @@ public class EntityGenerator {
 		instance.setCommitter(committer);
 		instance.setCreated(DateUtil.current());
 		instance.setContent(StringUtil.hasText(content) ? content : StringUtil.EMPTY);
+		return instance;
+	}
+	
+	public static final CompanyCustom newCompanyCustom(CompanyModifyParam param) {
+		CompanyCustom instance = new CompanyCustom();
+		instance.setId(param.getId());
+		instance.setMemo(param.getMemo());
 		return instance;
 	}
 }
