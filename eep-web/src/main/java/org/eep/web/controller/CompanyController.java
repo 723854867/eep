@@ -50,6 +50,7 @@ import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
 import org.rubik.bean.core.param.Param;
+import org.rubik.bean.core.param.SidParam;
 import org.rubik.soa.config.api.RubikConfigService;
 import org.rubik.soa.config.bean.entity.SysWord;
 import org.rubik.util.common.CollectionUtil;
@@ -88,6 +89,19 @@ public class CompanyController {
 		Visitor visitor = param.requestor();
 		CompanyInfo company = visitor.getCompany();
 		List<UserInfo> users = userService.getByCid(company.getId());
+		if (!CollectionUtil.isEmpty(users)) {
+			UserInfo info = users.iterator().next();
+			company.setContacts(info.getNickname());
+			company.setContactsPhone(info.getMobile());
+		}
+		return company;
+	}
+	
+	@ResponseBody
+	@RequestMapping("info/common")
+	public Object info(@RequestBody @Valid SidParam param) {
+		CompanyInfo company = Assert.notNull(companyService.company(param.getId()), Codes.COMPANY_NOT_EXIST);
+		List<UserInfo> users = userService.getByCid(param.getId());
 		if (!CollectionUtil.isEmpty(users)) {
 			UserInfo info = users.iterator().next();
 			company.setContacts(info.getNickname());
