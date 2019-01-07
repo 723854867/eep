@@ -163,6 +163,7 @@ public class CompanyManager {
 		CompanyCustom companyCustom = companyCustomDao.queryUnique(query);
 		if (null == companyCustom) 
 			companyCustom = EntityGenerator.newCompanyCustom(param);
+		companyCustom.setMemo(param.getMemo());
 		companyCustomDao.replace(companyCustom);
 	}
 	
