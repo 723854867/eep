@@ -3,51 +3,56 @@
 <mapper namespace="org.eep.mybatis.dao.DeviceDao" >
 
 	<select id="list" parameterType="org.eep.common.bean.param.DevicesParam" resultType="org.eep.common.bean.model.DeviceInfo">
-		SELECT 
-			a.*,
-			b.name cname,
-			c.name category,
-			IFNULL(d.warn_level, 0) warn_level
-		FROM 
-			device a
-		LEFT JOIN
-			company b
-		ON
-			a.cid=b.id
-		LEFT JOIN
-			device_category c
-		ON 
-			a.code=c.code
-		LEFT JOIN
-			(SELECT device_id, MAX(warn_level) warn_level FROM alert WHERE `type` IN(1,2,3) GROUP BY device_id) d
-		ON a.id=d.device_id
+		select * from
+		(
+			SELECT 
+				a.*,
+				b.name cname,
+				c.name category,
+				IFNULL(d.warn_level, 0) warn_level
+			FROM 
+				device a
+			LEFT JOIN
+				company b
+			ON
+				a.cid=b.id
+			LEFT JOIN
+				device_category c
+			ON 
+				a.code=c.code
+			LEFT JOIN
+				(SELECT device_id, MAX(warn_level) warn_level FROM alert WHERE `type` IN(1,2,3) GROUP BY device_id) d
+			ON a.id=d.device_id
+			<where>
+				<if test="null != id">
+					a.id=#{id}
+				</if>
+				<if test="null != cid">
+					AND a.cid=#{cid}
+				</if>
+				<if test="null != code">
+					AND a.code=#{code}
+				</if>
+				<if test="null != min">
+					<![CDATA[ AND b.region >= #{min} ]]>
+				</if>
+				<if test="null != max">
+					<![CDATA[ AND b.region <= #{max} ]]>
+				</if>
+				<if test="null != name">
+					AND a.`name` LIKE concat(concat('%',#{name}),'%')
+				</if>
+				<if test="null != cname">
+					AND b.`name` LIKE concat(concat('%',#{cname}),'%')
+				</if>
+				<if test="null != model">
+					AND a.`model` LIKE concat(concat('%',#{model}),'%')
+				</if>
+			</where>
+		) f 
 		<where>
-			<if test="null != id">
-				a.id=#{id}
-			</if>
-			<if test="null != cid">
-				AND a.cid=#{cid}
-			</if>
-			<if test="null != code">
-				AND a.code=#{code}
-			</if>
 			<if test="null != warnLevel">
-				AND d.`warn_level`=#{warnLevel}
-			</if>
-			<if test="null != min">
-				<![CDATA[ AND b.region >= #{min} ]]>
-			</if>
-			<if test="null != max">
-				<![CDATA[ AND b.region <= #{max} ]]>
-			</if>
-			<if test="null != name">
-				AND a.`name` LIKE concat(concat('%',#{name}),'%')
-			</if>
-			<if test="null != cname">
-				AND b.`name` LIKE concat(concat('%',#{cname}),'%')
-			</if>
-			<if test="null != model">
-				AND a.`model` LIKE concat(concat('%',#{model}),'%')
+				f.`warn_level`=#{warnLevel}
 			</if>
 		</where>
 	</select>
