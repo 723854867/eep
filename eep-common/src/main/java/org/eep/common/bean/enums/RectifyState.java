@@ -6,8 +6,6 @@ public enum RectifyState implements IEnum<Integer> {
 	
 	// 新建
 	NEWLY(1),
-	// 已通知
-	NOTIFIED(2),
 	// 已处理
 	FINISHED(3);
 	

@@ -170,9 +170,11 @@ public class CompanyManager {
 	@Transactional
 	public void alertCheck() { 
 		log.info("开始单位状态...");
-		// 获取新添加的整改通知
+		// 整改通知
+		// 先删除所有的整改警告
+		alertDao.deleteByQuery(new Query().and(Criteria.in("type", AlertType.RECITIFY_NOTICE, AlertType.RECITIFY_NOTICE_EXPIRE)));
 		List<Alert> alerts = new ArrayList<Alert>();
-		Query query = new Query().and(Criteria.neq("state", RectifyState.NEWLY)).forUpdate();
+		Query query = new Query().and(Criteria.neq("state", RectifyState.FINISHED)).forUpdate();
 		List<RectifyNotice> notices = rectifyNoticeDao.queryList(query);
 		for (RectifyNotice notice : notices) {
 			int now = DateUtil.current();
@@ -180,11 +182,7 @@ public class CompanyManager {
 			WarnLevel level = type == AlertType.RECITIFY_NOTICE ? notice.getWarnLevel() : WarnLevel.RED;
 			Alert alert = EntityGenerator.newAlert(notice.getCid(), type, level, notice.getId());
 			alerts.add(alert);
-			notice.setUpdated(DateUtil.current());
-			notice.setState(RectifyState.NOTIFIED);
 		}
-		if (!CollectionUtil.isEmpty(notices))
-			rectifyNoticeDao.replaceCollection(notices);
 	
 		// 先清空所有的证书警告
 		query = new Query().and(Criteria.in("type", AlertType.OPERATOR_CERT_EXPIRE_LIGHT, AlertType.OPERATOR_CERT_EXPIRE_SERIOUS));
@@ -229,6 +227,8 @@ public class CompanyManager {
 				}
 			});
 		}
+		if (!CollectionUtil.isEmpty(alerts))
+			CollectionUtil.dispersed(alerts, l -> alertDao.insertMany(l), 1000);
 		log.info("单位状态更新结束！");
 	}
 	
