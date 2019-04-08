@@ -218,12 +218,12 @@ public class CompanyManager {
 					}
 				}
 				if (choose.getExpireTime() <= DateUtil.current()) 				// 证书有效期过期
-					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId()));
+					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId(), choose.getOperatorId()));
 				else {
 					int certThreshold = rubikConfigService.config(Constants.OPERATOR_CERT_THRESHOLD_DAY);
 					long time = choose.getExpireTime() - certThreshold * DateUtil.DAY_SECONDS;
 					if (DateUtil.current() >= time) 							// 当前日期大于等于下次检测日期-30天
-						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId()));
+						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId(), choose.getOperatorId()));
 				}
 			});
 		}

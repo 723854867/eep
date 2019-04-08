@@ -6,7 +6,8 @@
 		SELECT 
 			a.*, 
 			b.`name` cname, 
-			c.`name` dname
+			c.`name` dname,
+			d.`name` operator_name
 		FROM 
 			alert a 
 		LEFT JOIN 
@@ -17,6 +18,10 @@
 			device c 
 		ON 
 			a.`device_id`=c.`id`
+		LEFT JOIN 
+			operator d
+		ON 
+			a.operator_id=d.id
 		<where>
 			<if test="null != id">
 				a.id=#{id}
@@ -25,7 +30,7 @@
 				AND a.cid=#{cid}
 			</if>
 			<if test="null != type">
-				AND a.alert_type=#{type}
+				AND a.type=#{type}
 			</if>
 			<if test="null != rectifyId">
 				AND a.rectify_id=#{rectifyId}
