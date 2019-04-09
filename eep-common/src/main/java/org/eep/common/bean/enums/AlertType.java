@@ -17,7 +17,7 @@ public enum AlertType implements IEnum<Integer> {
 	// 作业人员证书有效期轻度超期
 	OPERATOR_CERT_EXPIRE_LIGHT(7),
 	// 作业人员证书有效期重度超期
-	OPERATOR_CERT_EXPIRE_SERIOUS(7);
+	OPERATOR_CERT_EXPIRE_SERIOUS(8);
 	
 	private int mark;
 	
