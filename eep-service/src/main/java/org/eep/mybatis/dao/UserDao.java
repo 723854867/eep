@@ -3,6 +3,7 @@ package org.eep.mybatis.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.eep.common.bean.entity.User;
 import org.eep.common.bean.model.UserInfo;
@@ -15,4 +16,8 @@ public interface UserDao extends Dao<Long, User> {
 	
 	@Update("UPDATE user SET region=0 WHERE region>=#{min} AND region<=#{max}")
 	void deleteRegion(@Param("min") long min, @Param("max") long max);
+	
+	@Select("select * from user where uname = #{uname}")
+	User selectByUname(@Param("uname") String uname);
+	
 }

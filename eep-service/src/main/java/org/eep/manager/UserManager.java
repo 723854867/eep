@@ -84,6 +84,10 @@ public class UserManager {
 	public void modify(UserModifyParam param) {
 		User user = userDao.selectByKey(param.getId());
 		Assert.notNull(user, Codes.UNAME_NOT_EXIST);
+		if(null != param.getUname()) {
+			Assert.isNull(userDao.selectByUname(param.getUname()), Code.UNAME_EXIST);
+			user.setUname(param.getUname());
+		}
 		if(null != param.getMobile())
 			user.setMobile(param.getMobile());
 		if(null != param.getNickname())
