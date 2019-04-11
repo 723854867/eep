@@ -187,46 +187,46 @@ public class CompanyManager {
 		// 先清空所有的证书警告
 		query = new Query().and(Criteria.in("type", AlertType.OPERATOR_CERT_EXPIRE_LIGHT, AlertType.OPERATOR_CERT_EXPIRE_SERIOUS));
 		alertDao.deleteByQuery(query);
-		// 获取所有的证书来判断证书的有效期
-		List<OperatorCert> certs = operatorCertDao.selectList();
-		if (!CollectionUtil.isEmpty(certs)) {
-			MultiListMap<String, OperatorCert> map = new MultiListMap<String, OperatorCert>();
-			// 将 operator_id、type、issue_agency作为联合主键作为作业人员唯一证书的判断
-			certs.forEach(cert -> map.add(cert.getOperatorId() + "|" + cert.getType() + "|" + cert.getIssueAgency(), cert));
-			map.values().forEach(l -> {
-				OperatorCert choose = null;
-				for (OperatorCert temp : l) {
-					if (null == choose) {
-						choose = temp;
-						continue;
-					}
-					if (choose.getAuditType() == AuditType.TRIAL) {
-						if (temp.getAuditType() == AuditType.REVIEW) {			// 有复审取复审
-							choose = temp;
-							continue;
-						} else if (temp.getExpireTime() > choose.getExpireTime()) {	// 不是复审比较取时间最近的
-							choose = temp;
-							continue;
-						}
-					} else {
-						if (temp.getAuditType() == AuditType.TRIAL)				// 如果是初审直接略过
-							continue;
-						else if (temp.getExpireTime() > choose.getExpireTime()) {
-							choose = temp;
-							continue;
-						}
-					}
-				}
-				if (choose.getExpireTime() <= DateUtil.current()) 				// 证书有效期过期
-					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId()));
-				else {
-					int certThreshold = rubikConfigService.config(Constants.OPERATOR_CERT_THRESHOLD_DAY);
-					long time = choose.getExpireTime() - certThreshold * DateUtil.DAY_SECONDS;
-					if (DateUtil.current() >= time) 							// 当前日期大于等于下次检测日期-30天
-						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId()));
-				}
-			});
-		}
+//		// 获取所有的证书来判断证书的有效期
+//		List<OperatorCert> certs = operatorCertDao.selectList();
+//		if (!CollectionUtil.isEmpty(certs)) {
+//			MultiListMap<String, OperatorCert> map = new MultiListMap<String, OperatorCert>();
+//			// 将 operator_id、type、issue_agency作为联合主键作为作业人员唯一证书的判断
+//			certs.forEach(cert -> map.add(cert.getOperatorId() + "|" + cert.getType() + "|" + cert.getIssueAgency(), cert));
+//			map.values().forEach(l -> {
+//				OperatorCert choose = null;
+//				for (OperatorCert temp : l) {
+//					if (null == choose) {
+//						choose = temp;
+//						continue;
+//					}
+//					if (choose.getAuditType() == AuditType.TRIAL) {
+//						if (temp.getAuditType() == AuditType.REVIEW) {			// 有复审取复审
+//							choose = temp;
+//							continue;
+//						} else if (temp.getExpireTime() > choose.getExpireTime()) {	// 不是复审比较取时间最近的
+//							choose = temp;
+//							continue;
+//						}
+//					} else {
+//						if (temp.getAuditType() == AuditType.TRIAL)				// 如果是初审直接略过
+//							continue;
+//						else if (temp.getExpireTime() > choose.getExpireTime()) {
+//							choose = temp;
+//							continue;
+//						}
+//					}
+//				}
+//				if (choose.getExpireTime() <= DateUtil.current()) 				// 证书有效期过期
+//					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId()));
+//				else {
+//					int certThreshold = rubikConfigService.config(Constants.OPERATOR_CERT_THRESHOLD_DAY);
+//					long time = choose.getExpireTime() - certThreshold * DateUtil.DAY_SECONDS;
+//					if (DateUtil.current() >= time) 							// 当前日期大于等于下次检测日期-30天
+//						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId()));
+//				}
+//			});
+//		}
 		if (!CollectionUtil.isEmpty(alerts))
 			CollectionUtil.dispersed(alerts, l -> alertDao.insertMany(l), 1000);
 		log.info("单位状态更新结束！");
