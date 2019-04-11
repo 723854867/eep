@@ -187,7 +187,7 @@ public class CompanyManager {
 		// 先清空所有的证书警告
 		query = new Query().and(Criteria.in("type", AlertType.OPERATOR_CERT_EXPIRE_LIGHT, AlertType.OPERATOR_CERT_EXPIRE_SERIOUS));
 		alertDao.deleteByQuery(query);
-//		// 获取所有的证书来判断证书的有效期
+		// 获取所有的证书来判断证书的有效期
 //		List<OperatorCert> certs = operatorCertDao.selectList();
 //		if (!CollectionUtil.isEmpty(certs)) {
 //			MultiListMap<String, OperatorCert> map = new MultiListMap<String, OperatorCert>();
@@ -218,12 +218,12 @@ public class CompanyManager {
 //					}
 //				}
 //				if (choose.getExpireTime() <= DateUtil.current()) 				// 证书有效期过期
-//					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId()));
+//					alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_SERIOUS, WarnLevel.RED, choose.getId(), choose.getOperatorId()));
 //				else {
 //					int certThreshold = rubikConfigService.config(Constants.OPERATOR_CERT_THRESHOLD_DAY);
 //					long time = choose.getExpireTime() - certThreshold * DateUtil.DAY_SECONDS;
 //					if (DateUtil.current() >= time) 							// 当前日期大于等于下次检测日期-30天
-//						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId()));
+//						alerts.add(EntityGenerator.newAlert(choose.getCid(), AlertType.OPERATOR_CERT_EXPIRE_LIGHT, WarnLevel.YELLOW, choose.getId(), choose.getOperatorId()));
 //				}
 //			});
 //		}

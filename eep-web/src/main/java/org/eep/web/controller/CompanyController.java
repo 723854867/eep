@@ -2,7 +2,9 @@ package org.eep.web.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -13,6 +15,7 @@ import org.eep.chuanglan.model.VarSmsRequest;
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
+import org.eep.common.bean.entity.OperatorCert;
 import org.eep.common.bean.entity.RectifyNotice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.entity.SysRegion;
@@ -46,6 +49,7 @@ import org.rubik.bean.core.Constants;
 import org.rubik.bean.core.enums.Locale;
 import org.rubik.bean.core.model.Code;
 import org.rubik.bean.core.model.Criteria;
+import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.model.Result;
 import org.rubik.bean.core.param.LidParam;
@@ -227,7 +231,18 @@ public class CompanyController {
 	@ResponseBody
 	@RequestMapping("operator/certs")
 	public Object operatorCerts(@RequestBody @Valid OperatorCertsParam param) {
-		return companyService.operatorCerts(param);
+		Pager<OperatorCert> pager = companyService.operatorCerts(param);
+		if (!CollectionUtil.isEmpty(pager.getList())) {
+			Map<String, OperatorCert> map = new HashMap<String, OperatorCert>();
+			pager.getList().sort((o1, o2) -> o2.getExpireTime() - o1.getExpireTime());
+			pager.getList().forEach(cert -> {
+				String key = cert.getOperatorId() + "|" + cert.getType() + "|" + cert.getIssueAgency();
+				if (!map.containsKey(key))
+					map.put(key, cert);
+			});
+			pager.setList(new ArrayList<OperatorCert>(map.values()));
+		}
+		return pager;
 	}
 	
 	/**

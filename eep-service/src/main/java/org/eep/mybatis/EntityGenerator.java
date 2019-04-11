@@ -158,6 +158,8 @@ public class EntityGenerator {
 		instance.setType(type);
 		instance.setDeviceId(deviceId);
 		instance.setWarnLevel(warnLevel);
+		instance.setCertId(StringUtil.EMPTY);
+		instance.setOperatorId(StringUtil.EMPTY);
 		instance.setCreated(DateUtil.current());
 		return instance;
 	}
@@ -168,6 +170,20 @@ public class EntityGenerator {
 		instance.setType(type);
 		instance.setRectifyId(rectifyId);
 		instance.setWarnLevel(warnLevel);
+		instance.setCertId(StringUtil.EMPTY);
+		instance.setDeviceId(StringUtil.EMPTY);
+		instance.setOperatorId(StringUtil.EMPTY);
+		instance.setCreated(DateUtil.current());
+		return instance;
+	}
+	
+	public static final Alert newAlert(String cid, AlertType type, WarnLevel warnLevel, String certId, String operatorId) {
+		Alert instance = new Alert();
+		instance.setCid(cid);
+		instance.setType(type);
+		instance.setCertId(certId);
+		instance.setWarnLevel(warnLevel);
+		instance.setOperatorId(operatorId);
 		instance.setDeviceId(StringUtil.EMPTY);
 		instance.setCreated(DateUtil.current());
 		return instance;

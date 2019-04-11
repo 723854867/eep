@@ -19,8 +19,11 @@ public class AlertInfo implements Serializable {
 	private int created;
 	private String cname;
 	private String dname;
+	private String certId;
 	private AlertType type;
 	private long rectifyId;
 	private String deviceId;
+	private String operatorId;
 	private WarnLevel warnLevel;
+	private String operatorName;
 }

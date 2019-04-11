@@ -21,9 +21,11 @@ public class Alert implements Identifiable<Long> {
 	private long id;
 	private String cid;
 	private int created;
+	private String certId;
 	private AlertType type;
 	private long rectifyId;
 	private String deviceId;
+	private String operatorId;
 	private WarnLevel warnLevel;
 	
 	@Override
