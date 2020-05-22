@@ -9,6 +9,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
@@ -39,7 +40,7 @@ public class QRCodeUtil {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
-        Hashtable hints = new Hashtable();
+		HashMap hints = new HashMap();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
         hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
         hints.put(EncodeHintType.MARGIN, 1);
@@ -60,6 +61,43 @@ public class QRCodeUtil {
         QRCodeUtil.insertImage(image, imgPath, needCompress);
         return image;
     }
+	
+	 /**
+     * @param content 内容  
+     * @param logoImage Logo图片地址  
+     * @param bottomDes 底部描述
+     * @param needCompress 是否压缩Logo大小 
+     * @param needDescription 是否需要底部描述  
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+	private static BufferedImage createImage(String content,String logoImage, String bottomDes, boolean needCompress) throws Exception {    
+    	HashMap hints = new HashMap();    
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); //容错级别 H->30%    
+        hints.put(EncodeHintType.CHARACTER_SET, CHARSET);    
+        hints.put(EncodeHintType.MARGIN, 1);    
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content,BarcodeFormat.QR_CODE, QRCODE_SIZE, QRCODE_SIZE, hints);    
+        int width = bitMatrix.getWidth();    
+        int height = bitMatrix.getHeight();   
+        int tempHeight = height;  
+        boolean needDescription=(null==bottomDes&&"".equals(bottomDes));  
+        if (needDescription) {  
+            tempHeight += 30;  
+        }   
+        BufferedImage image = new BufferedImage(width, tempHeight, BufferedImage.TYPE_INT_RGB);   
+        for (int x = 0; x < width; x++) {    
+            for (int y = 0; y < height; y++) {    
+                image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);    
+            }    
+        }    
+        if(null==logoImage)return image;    
+        // 插入图片    
+        QRCodeUtil.insertImage(image, logoImage, needCompress);  
+        if(needDescription) return image;  
+        QRCodeUtil.addFontImage(image, bottomDes);  //添加底部描述
+        return image;    
+    }   
 	
 	private static void insertImage(BufferedImage source, String imgPath, boolean needCompress) throws Exception {
         File file = new File(imgPath);
@@ -94,13 +132,30 @@ public class QRCodeUtil {
         graph.draw(shape);
         graph.dispose();
     }
+	
+	/** 
+     * 添加 底部图片文字 
+     * @param source   图片源 
+     * @param declareText 文字本文 
+     */  
+    private static void addFontImage(BufferedImage source, String declareText) {  
+        BufferedImage textImage = FontImage.getImage(declareText, QRCODE_SIZE, 50);  
+        Graphics2D graph = source.createGraphics(); 
 
-    public static void encode(String content, String imgPath, String destPath, boolean needCompress) throws Exception {
-        BufferedImage image = QRCodeUtil.createImage(content, imgPath, needCompress);
-        mkdirs(destPath);
+        int width = textImage.getWidth(null);    
+        int height = textImage.getHeight(null);    
+        Image src =textImage;    
+        graph.drawImage(src, 0, QRCODE_SIZE - 30, width, height, null);     
+        graph.dispose();    
+    }
+
+    public static BufferedImage encode(String content, String imgPath, String bottomDes, boolean needCompress) throws Exception {
+        BufferedImage image = QRCodeUtil.createImage(content, imgPath, bottomDes,needCompress);
+//        mkdirs(destPath);
         // String file = new Random().nextInt(99999999)+".jpg";
         // ImageIO.write(image, FORMAT_NAME, new File(destPath+"/"+file));
-        ImageIO.write(image, FORMAT_NAME, new File(destPath));
+//        ImageIO.write(image, FORMAT_NAME, new File(destPath));
+        return image;
     }
 
     public static BufferedImage encode(String content, String imgPath, boolean needCompress) throws Exception {

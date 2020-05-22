@@ -1,7 +1,6 @@
 package org.eep.web.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.CompanyInfo;
-import org.eep.common.bean.model.DeviceDetail;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
@@ -226,8 +224,9 @@ public class DeviceController {
         response.setHeader("Content-Disposition", "attachment;filename=" + downloadFilename+".zip");
         zos = new ZipOutputStream(response.getOutputStream());
         for(Device device : deviceDetails) {
-        	zos.putNextEntry(new ZipEntry(device.getName()+".png"));
-			ImageIO.write(QRCodeUtil.encode("http://183.246.75.54:60080/cms_tzsb/h5/deivce_detail.html?id="+device.getId(),"/root/web/nginx/cms_tzsb/h5/img/logo.png",true),"jpg",zos);
+        	zos.putNextEntry(new ZipEntry(device.getName()+"_"+device.getDin()+".png"));
+			ImageIO.write(QRCodeUtil.encode("http://183.246.75.54:60080/cms_tzsb/h5/deivce_detail.html?id="+device.getId(),
+					"/root/web/nginx/cms_tzsb/h5/img/logo.png",device.getName()+"_"+device.getDin(),true),"jpg",zos);
         }
         zos.flush();
         zos.close();
