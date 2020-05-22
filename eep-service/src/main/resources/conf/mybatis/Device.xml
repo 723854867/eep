@@ -57,6 +57,34 @@
 		</where>
 	</select>
 	
+	<select id="detail" resultType="org.eep.common.bean.model.DeviceDetail">
+		SELECT 
+			a.name,
+			a.din,
+			b.name cname,
+			c.name category,
+			IFNULL(d.warn_level, 0) warn_level,
+			e.next_time
+		FROM 
+			device a
+		LEFT JOIN
+			company b
+		ON
+			a.cid=b.id
+		LEFT JOIN
+			device_category c
+		ON 
+			a.code=c.code
+		LEFT JOIN
+			(SELECT device_id, MAX(warn_level) warn_level FROM alert WHERE `type` IN(1,2,3) GROUP BY device_id) d
+		ON a.id=d.device_id
+		LEFT JOIN
+			(SELECT next_time,device_id FROM log_examine WHERE device_id=#{id} ORDER BY next_time DESC LIMIT 1) e 
+		ON a.id=e.device_id	
+		
+		where a.id = #{id} 
+	</select>
+	
 	<select id="nextExamineTime" resultType="java.lang.Long">
 		SELECT next_time FROM log_examine WHERE device_id=#{id} ORDER BY next_time DESC LIMIT 1
 	</select>

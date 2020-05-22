@@ -1,11 +1,17 @@
 package org.eep.web.controller;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.eep.bean.param.QrcodeDownloadParam;
 import org.eep.bean.param.RepairCreateParam;
 import org.eep.common.Codes;
 import org.eep.common.Consts;
@@ -24,6 +30,7 @@ import org.eep.mybatis.EntityGenerator;
 import org.eep.service.CompanyService;
 import org.eep.service.DeviceService;
 import org.eep.service.RegionService;
+import org.eep.util.QRCodeUtil;
 import org.eep.util.RegionUtil;
 import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.Constants;
@@ -62,6 +69,12 @@ public class DeviceController {
 		regionService.userRegionVerify(param.requestor(), param.getRegion());
 		RegionUtil.setRange(param, Assert.notNull(regionService.region(param.getRegion()), Codes.REGION_NOT_EXIST));
 		return deviceService.devices(param);
+	}
+	
+	@ResponseBody
+	@RequestMapping("detail")
+	public Object detail(@RequestBody @Valid SidParam param) {
+		return deviceService.detail(param.getId());
 	}
 	
 	@ResponseBody
@@ -193,5 +206,27 @@ public class DeviceController {
 	public Object categoryDelete(@RequestBody @Valid SidParam param) { 
 		deviceService.categoryDelete(param);
 		return Result.ok();
+	}
+	
+	@ResponseBody
+	@RequestMapping("qrcode/download")
+	public void  qrcodeDownload(HttpServletResponse response,@RequestBody @Valid QrcodeDownloadParam param) throws Exception{
+		//获取设备信息
+		List<Device> deviceDetails = deviceService.devices(param.getIds());
+		ZipOutputStream zos = null;
+        String  downloadFilename = "设备二维码";
+        //转换中文否则可能会产生乱码
+        downloadFilename = URLEncoder.encode(downloadFilename, "UTF-8");
+        // 指明response的返回对象是文件流
+        response.setContentType("application/octet-stream");
+        // 设置在下载框默认显示的文件名
+        response.setHeader("Content-Disposition", "attachment;filename=" + downloadFilename+".zip");
+        zos = new ZipOutputStream(response.getOutputStream());
+        for(Device device : deviceDetails) {
+        	zos.putNextEntry(new ZipEntry(device.getName()+".png"));
+			ImageIO.write(QRCodeUtil.encode("http://localhost:8080/h5/device_detail.html?id="+device.getId(),"D:/logo.png",true),"jpg",zos);
+        }
+        zos.flush();
+        zos.close();
 	}
 }

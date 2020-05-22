@@ -6,6 +6,7 @@ import java.util.Set;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Resource;
+import org.eep.common.bean.model.DeviceDetail;
 import org.eep.common.bean.model.DeviceInfo;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.RepairInfo;
@@ -19,6 +20,7 @@ import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.model.Query;
 import org.rubik.bean.core.param.SidParam;
 import org.rubik.mybatis.PagerUtil;
+import org.rubik.util.common.DateUtil;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
@@ -81,5 +83,12 @@ public class DeviceService {
 		if (null != param.getPage())
 			PageHelper.startPage(param.getPage(), param.getPageSize());
 		return PagerUtil.page(deviceManager.repairs(param));
+	}
+
+	public DeviceDetail detail(String id) {
+		 DeviceDetail device = deviceManager.detail(id);
+		 if(device.getNextTime()!=null)
+			 device.setTime(DateUtil.getDate(device.getNextTime()*1000, DateUtil.YMD));
+		 return device;
 	}
 }
