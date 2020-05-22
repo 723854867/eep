@@ -1,6 +1,7 @@
 package org.eep.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.CompanyType;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.model.CompanyInfo;
+import org.eep.common.bean.model.DeviceDetail;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
@@ -213,6 +215,7 @@ public class DeviceController {
 	public void  qrcodeDownload(HttpServletResponse response,@RequestBody @Valid QrcodeDownloadParam param) throws Exception{
 		//获取设备信息
 		List<Device> deviceDetails = deviceService.devices(param.getIds());
+		
 		ZipOutputStream zos = null;
         String  downloadFilename = "设备二维码";
         //转换中文否则可能会产生乱码
@@ -224,7 +227,7 @@ public class DeviceController {
         zos = new ZipOutputStream(response.getOutputStream());
         for(Device device : deviceDetails) {
         	zos.putNextEntry(new ZipEntry(device.getName()+".png"));
-			ImageIO.write(QRCodeUtil.encode("http://localhost:8080/h5/device_detail.html?id="+device.getId(),"D:/logo.png",true),"jpg",zos);
+			ImageIO.write(QRCodeUtil.encode("http://183.246.75.54:60080/cms_tzsb/h5/deivce_detail.html?id="+device.getId(),"/root/web/nginx/cms_tzsb/h5/img/logo.png",true),"jpg",zos);
         }
         zos.flush();
         zos.close();
