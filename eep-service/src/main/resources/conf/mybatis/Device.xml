@@ -88,4 +88,22 @@
 	<select id="nextExamineTime" resultType="java.lang.Long">
 		SELECT next_time FROM log_examine WHERE device_id=#{id} ORDER BY next_time DESC LIMIT 1
 	</select>
+	
+	<select id="deviceInspectList" parameterType="org.eep.common.bean.param.DeviceInspectParam" resultType="org.eep.common.bean.entity.DeviceInspect">
+		select * from device_inspect
+		<where>
+			<if test="null != start">
+				<![CDATA[ AND created >= #{start} ]]>
+			</if>
+			<if test="null != end">
+				<![CDATA[ AND created <= #{end} ]]>
+			</if>
+			<if test="null != name">
+				AND `name` LIKE concat(concat('%',#{name}),'%')
+			</if>
+			<if test="null != username">
+				AND `username` LIKE concat(concat('%',#{username}),'%')
+			</if>
+		</where>
+	</select>
 </mapper>

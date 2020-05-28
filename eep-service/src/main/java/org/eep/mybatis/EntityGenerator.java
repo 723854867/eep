@@ -3,7 +3,9 @@ package org.eep.mybatis;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.CompanyCustom;
+import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
+import org.eep.common.bean.entity.DeviceInspect;
 import org.eep.common.bean.entity.Inspect;
 import org.eep.common.bean.entity.Introspect;
 import org.eep.common.bean.entity.Law;
@@ -19,6 +21,7 @@ import org.eep.common.bean.enums.AlertType;
 import org.eep.common.bean.enums.RectifyState;
 import org.eep.common.bean.enums.ResourceType;
 import org.eep.common.bean.enums.WarnLevel;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.CompanyModifyParam;
@@ -240,6 +243,24 @@ public class EntityGenerator {
 		CompanyCustom instance = new CompanyCustom();
 		instance.setId(param.getId());
 		instance.setMemo(param.getMemo());
+		return instance;
+	}
+
+	public static DeviceInspect newDeviceInspect(Visitor visitor, Device device,CompanyInfo company,Long nextTime) {
+		DeviceInspect instance = new DeviceInspect();
+		instance.setAddress(device.getAddress());
+		instance.setCompanyId(company.getId());
+		instance.setCompanyName(company.getName());
+		instance.setContact(device.getContact());
+		instance.setContactPhone(device.getContactPhone());
+		instance.setCreated(DateUtil.current());
+		instance.setDeviceCode(device.getDin());
+		instance.setDeviceId(device.getId());
+		instance.setDeviceName(device.getName());
+		instance.setNextTime(nextTime);
+		instance.setUid(visitor.getUser().getId());
+		instance.setUsername(visitor.getUser().getNickname());
+		instance.setUseState(device.getUseState());
 		return instance;
 	}
 }

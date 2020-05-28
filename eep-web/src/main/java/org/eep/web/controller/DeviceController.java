@@ -24,6 +24,7 @@ import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.CategoryQueryParam;
+import org.eep.common.bean.param.DeviceInspectParam;
 import org.eep.common.bean.param.DevicesParam;
 import org.eep.common.bean.param.RepairsParam;
 import org.eep.mybatis.EntityGenerator;
@@ -206,6 +207,21 @@ public class DeviceController {
 	public Object categoryDelete(@RequestBody @Valid SidParam param) { 
 		deviceService.categoryDelete(param);
 		return Result.ok();
+	}
+	
+	//app端扫码触发设备检查请求
+	@ResponseBody
+	@RequestMapping("inspect")
+	public Object deviceInspect(@RequestBody @Valid SidParam param) { 
+		deviceService.deviceInspect(param);
+		return Result.ok();
+	}
+	
+
+	@ResponseBody
+	@RequestMapping("inspect/list")
+	public Object deviceInspectList(@RequestBody @Valid DeviceInspectParam param) { 
+		return deviceService.deviceInspectList(param);
 	}
 	
 	@ResponseBody

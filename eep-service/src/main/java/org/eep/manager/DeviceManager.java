@@ -4,27 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.Valid;
+
 import org.eep.common.Codes;
 import org.eep.common.bean.entity.Alert;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
+import org.eep.common.bean.entity.DeviceInspect;
 import org.eep.common.bean.entity.LogExamine;
 import org.eep.common.bean.entity.Repair;
 import org.eep.common.bean.entity.RepairDevice;
 import org.eep.common.bean.entity.Resource;
 import org.eep.common.bean.enums.AlertType;
 import org.eep.common.bean.enums.WarnLevel;
+import org.eep.common.bean.model.CompanyInfo;
 import org.eep.common.bean.model.DeviceDetail;
 import org.eep.common.bean.model.DeviceInfo;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.RepairInfo;
+import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
+import org.eep.common.bean.param.DeviceInspectParam;
 import org.eep.common.bean.param.DevicesParam;
 import org.eep.common.bean.param.RepairsParam;
 import org.eep.mybatis.EntityGenerator;
 import org.eep.mybatis.dao.AlertDao;
 import org.eep.mybatis.dao.DeviceCategoryDao;
 import org.eep.mybatis.dao.DeviceDao;
+import org.eep.mybatis.dao.DeviceInspectDao;
 import org.eep.mybatis.dao.LogExamineDao;
 import org.eep.mybatis.dao.RepairDao;
 import org.eep.mybatis.dao.RepairDeviceDao;
@@ -65,6 +72,8 @@ public class DeviceManager {
 	private DeviceCategoryDao deviceCategoryDao;
 	@javax.annotation.Resource
 	private RubikConfigService rubikConfigService;
+	@javax.annotation.Resource
+	private DeviceInspectDao deviceInspectDao;
 	
 	public void categoryCreate(CategoryParam param) { 
 		deviceCategoryDao.insert(EntityGenerator.newDeviceCategory(param));
@@ -158,5 +167,20 @@ public class DeviceManager {
 
 	public DeviceDetail detail(String id) {
 		return deviceDao.detail(id);
+	}
+	
+	public Device selectByKey(String id) {
+		return deviceDao.selectByKey(id);
+	}
+
+	public void deviceInspect(Visitor visitor, Device device) {
+		CompanyInfo companyInfo = companyManager.company(device.getCid());
+		Long nextTime = deviceDao.nextExamineTime(device.getId());
+		DeviceInspect logInspect = EntityGenerator.newDeviceInspect(visitor,device,companyInfo,nextTime);
+		deviceInspectDao.insert(logInspect);
+	}
+
+	public List<DeviceInspect> deviceInspectList(@Valid DeviceInspectParam param) {
+		return deviceDao.deviceInspectList(param);
 	}
 }

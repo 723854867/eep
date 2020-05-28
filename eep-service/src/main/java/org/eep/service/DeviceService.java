@@ -3,6 +3,9 @@ package org.eep.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.Valid;
+
+import org.eep.common.Codes;
 import org.eep.common.bean.entity.Device;
 import org.eep.common.bean.entity.DeviceCategory;
 import org.eep.common.bean.entity.Resource;
@@ -10,11 +13,14 @@ import org.eep.common.bean.model.DeviceDetail;
 import org.eep.common.bean.model.DeviceInfo;
 import org.eep.common.bean.model.RepairDetail;
 import org.eep.common.bean.model.RepairInfo;
+import org.eep.common.bean.model.Visitor;
 import org.eep.common.bean.param.CategoryParam;
 import org.eep.common.bean.param.CategoryQueryParam;
+import org.eep.common.bean.param.DeviceInspectParam;
 import org.eep.common.bean.param.DevicesParam;
 import org.eep.common.bean.param.RepairsParam;
 import org.eep.manager.DeviceManager;
+import org.rubik.bean.core.Assert;
 import org.rubik.bean.core.model.Criteria;
 import org.rubik.bean.core.model.Pager;
 import org.rubik.bean.core.model.Query;
@@ -90,5 +96,16 @@ public class DeviceService {
 		 if(device.getNextTime()!=null)
 			 device.setTime(DateUtil.getDate(device.getNextTime()*1000, DateUtil.YMD));
 		 return device;
+	}
+
+	public void deviceInspect(@Valid SidParam param) {
+		Visitor visitor = param.requestor();
+		Device device = Assert.notNull(deviceManager.selectByKey(param.getId()), Codes.DEVICE_NOT_EXIST);
+		deviceManager.deviceInspect(visitor,device);
+	}
+
+	public Object deviceInspectList(@Valid DeviceInspectParam param) {
+		PageHelper.startPage(param.getPage(), param.getPageSize());
+		return PagerUtil.page(deviceManager.deviceInspectList(param));
 	}
 }

@@ -71,7 +71,7 @@ public class QRCodeUtil {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	private static BufferedImage createImage(String content,String logoImage, String bottomDes, boolean needCompress) throws Exception {    
     	HashMap hints = new HashMap();    
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H); //容错级别 H->30%    
